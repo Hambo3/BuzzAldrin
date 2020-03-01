@@ -84,6 +84,8 @@ var map = {
 
 /*****************************/
 var ctx;
+var debug;
+
 function Start(canvasBody)
 {	
 	// Create the canvas
@@ -98,12 +100,14 @@ function Start(canvasBody)
     	b.appendChild(canvas);
 
 		//everything is drawn by this renderer
-		Renderer = new SpriteRenderer(ctx, 
+		Renderer = new RenderingManager(ctx, 
 			{
 				spritesheet:fileSource,
 				spriteData:spriteDef,
 				onReady:init
 			});
+
+		debug = new Debug({ctx:ctx});	
 
 	}
 }

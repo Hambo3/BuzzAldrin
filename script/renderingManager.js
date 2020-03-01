@@ -1,8 +1,7 @@
 //handles loading and keeps track of all graphics
 //performs all rendering operations
-var SpriteRenderer = function (ctx, options) {
+var RenderingManager = function (ctx, options) {
     var spritesheet;
-    
     var spriteData = {};
     var onReady;
     var assets = [];
@@ -10,43 +9,12 @@ var SpriteRenderer = function (ctx, options) {
 
     var context = ctx;
 
-    init(options);
+    spritesheet = options.spritesheet;
+    spriteData = options.spriteData;
+    onReady = options.onReady;
+    centerBased = options.centerBased || centerBased;
 
-    function init(options) {
-
-        spritesheet = options.spritesheet || spritesheet;
-        spriteData = options.spriteData || spriteData;
-        onReady = options.onReady || null;
-        centerBased = options.centerBased || centerBased;
-
-        var numAssets = spritesheet.length;
-
-        spritesheet.forEach(function(sheet) 
-        {
-            if(sheet.recol)
-            {
-                --numAssets;
-            }
-            else
-            {
-                var a = new Image();
-                a.src = sheet.src;
-                var tag = sheet.tag;
-                a.onload = function() { 
-                    assets[tag] = a;
-                    
-                    if(--numAssets == 0)
-                    {
-                        if(onReady){
-                            onReady();				
-                        }
-                    }
-                };
-            }
-
-        });
-       context.imageSmoothingEnabled = false;
-    }
+    init();
 
     function rbox(x, y, w, h, r) {
         if (w < 2 * r) r = w / 2;
@@ -92,15 +60,78 @@ var SpriteRenderer = function (ctx, options) {
             w, h, -w/2, -h/2, w, h); 
     }
 
+    function init() {
+        var numAssets = spritesheet.length;
+
+        spritesheet.forEach(function(sheet) 
+        {
+            if(sheet.recol)
+            {
+                --numAssets;
+            }
+            else
+            {
+                var a = new Image();
+                a.src = sheet.src;
+                var tag = sheet.tag;
+                a.onload = function() { 
+                    assets[tag] = a;
+                    
+                    if(--numAssets == 0)
+                    {
+                        if(onReady){
+                            onReady();				
+                        }
+                    }
+                };
+            }
+
+        });
+       context.imageSmoothingEnabled = false;
+    }
+
     return {
+        Init: function (options) {
+
+            spritesheet = options.spritesheet;
+            context = options.context;
+            spriteData = options.spriteData;
+            onReady = options.onReady;
+            centerBased = options.centerBased || centerBased;
+
+            var numAssets = spritesheet.length;
+
+            spritesheet.forEach(function(sheet) 
+            {
+                if(sheet.recol)
+                {
+                    --numAssets;
+                }
+                else
+                {
+                    var a = new Image();
+                    a.src = sheet.src;
+                    var tag = sheet.tag;
+                    a.onload = function() { 
+                        assets[tag] = a;
+                        
+                        if(--numAssets == 0)
+                        {
+                            if(onReady){
+                                onReady();				
+                            }
+                        }
+                    };
+                }
+
+            });
+           context.imageSmoothingEnabled = false;
+        },
         SetContext: function (sx, sy){
             context.setTransform(sx, 0, 0, sy, 0, 0);
         },
         Clear: function (){
-        //    contex.fillRect(0, 0, 640, 480);
-        //contex.clearRect(0, 0, 640, 480);
-        //contex.stroke(); 
-            //context.clearRect(0, 0, 640, 480);
+            context.clearRect(0, 0, 640, 480);
         },
         Sprite: function(x, y, sprite, frame, scale, rotate, alpha){
             DrawSprite(x, y, sprite, frame, scale, rotate, alpha);
@@ -109,9 +140,9 @@ var SpriteRenderer = function (ctx, options) {
             context.setTransform(1, 0, 0, 1, 0, 0);
             RenderSprite(x, y, sprite, 0, false);
         },
-        RawTile: function(x, y, sprite, s){
+        RawTile: function(x, y, sprite){
             //RenderSprite(x, y, sprite, 0, false);
-            DrawSprite(x, y, sprite, 0, s, 0, 1);
+            DrawSprite(x, y, sprite, 0, 4, 0, 1);
         },
         DrawBox: function(box, fill, pen, r, a){
             RenderBox(box, fill, pen, r, a);

@@ -31,26 +31,22 @@ var MapManager = function () {
     {
         return (end-start) * amt+start;
     }
-
-    function render(zoom) {
+    function render(level) {
         var m = 0;
         var p;
         var mcols = map.dimensions.width;
-        var col = map.screen.width;
-        var row = map.screen.height;
-        Renderer.SetContext(1, 1);
+        var col = map.screen.width+1;
+        var row = map.screen.height+1;
+        //Renderer.SetContext(1, 1);
         for(var r=0; r < row; r++) {
             for(var c = 0; c < col; c++) {
                 m = ((r+scroll.yoffset) * mcols) + (c+scroll.xoffset);
                 p = map.data[m];
 
-                var x = scroll.x+offset.x*zoom;
-                var y = scroll.y+offset.y*zoom;
-                Renderer.RawTile(
-                    (c * (map.tile.width*zoom)) + x, 
-                        (r * (map.tile.height*zoom)) + y,
-                        map.set + p,
-                        zoom);                    
+                    Renderer.Tile(
+                        (c * map.tile.width) + scroll.x+offset.x, 
+                        (r * map.tile.height) + scroll.y+offset.y, 
+                        map.set + p);                    
 
 
             } 

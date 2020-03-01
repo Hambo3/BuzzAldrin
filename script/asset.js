@@ -36,6 +36,22 @@
         update: function(dt, z, os) {
             //this.x += this.rate;
             //this.rotation +=0.01;
+            if(input.isDown('UP'))
+            {
+                this.y -=1;
+            }
+            if(input.isDown('DOWN'))
+            {
+                this.y +=1;
+            }
+            if(input.isDown('LEFT'))
+            {
+                this.x -=1;
+            }
+            if(input.isDown('RIGHT'))
+            {
+                this.x +=1;
+            }
             this.scale = z;
 			this.sprite.Update(dt, 
 				{

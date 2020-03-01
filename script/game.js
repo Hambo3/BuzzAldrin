@@ -15,26 +15,29 @@
 
     Game.prototype = {        
         Update: function(dt){
-            if(input.isDown('UP'))
+            if(input.isDown('Z'))
             {
                 this.zoom +=0.01;
             }
-            if(input.isDown('DOWN'))
+            if(input.isDown('X'))
             {
                 this.zoom -=0.01;
             }
+            //this.map.SetZoom(this.zoom);
             this.map.ScrollTo(this.buzz.x, this.buzz.y);
             var mp = this.map.ScrollOffset(); 
 
             this.buzz.update(dt, this.zoom, mp);
-            this.neil.update(dt, this.zoom, {x:0,y:0});
+            //this.neil.update(dt, this.zoom, mp);
         },
         Render: function(){    
 
-            this.map.Render(this.zoom);
+            this.map.Render();
 
             this.buzz.render();  
-            this.neil.render();  
+            //this.neil.render();  
+            debug.Print("zoom:","["+this.zoom+"]"); 
+            debug.Render(true, true);
         }
     };
 
