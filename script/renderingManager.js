@@ -77,7 +77,7 @@ var SpriteRenderer = function (ctx, options) {
             y-=(s.h/2);
         }        
         context.drawImage(assets[s.tag], frame.x, frame.y, s.w, s.h, 
-            Math.round(x), Math.round(yield), s.w, s.h);
+            Math.round(x), Math.round(y), s.w, s.h);
     }
     
     function DrawSprite(x, y, sprite, spriteInd, s, r, a){
@@ -97,7 +97,10 @@ var SpriteRenderer = function (ctx, options) {
             context.setTransform(sx, 0, 0, sy, 0, 0);
         },
         Clear: function (){
-            context.clearRect(0, 0, 640, 480);
+        //    contex.fillRect(0, 0, 640, 480);
+        //contex.clearRect(0, 0, 640, 480);
+        //contex.stroke(); 
+            //context.clearRect(0, 0, 640, 480);
         },
         Sprite: function(x, y, sprite, frame, scale, rotate, alpha){
             DrawSprite(x, y, sprite, frame, scale, rotate, alpha);
@@ -106,9 +109,9 @@ var SpriteRenderer = function (ctx, options) {
             context.setTransform(1, 0, 0, 1, 0, 0);
             RenderSprite(x, y, sprite, 0, false);
         },
-        RawTile: function(x, y, sprite){
+        RawTile: function(x, y, sprite, s){
             //RenderSprite(x, y, sprite, 0, false);
-            DrawSprite(x, y, sprite, 0, 4, 0, 1);
+            DrawSprite(x, y, sprite, 0, s, 0, 1);
         },
         DrawBox: function(box, fill, pen, r, a){
             RenderBox(box, fill, pen, r, a);
