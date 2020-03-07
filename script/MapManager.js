@@ -8,14 +8,17 @@ var MapManager = function () {
         colliders:{hit:[],over:[]},
         data:[]
     };
-    var offset = {x:0,y:0};
+    var zoom = 1;
+    var twidth = map.tile.width * zoom;
+    var theight = map.tile.height * zoom;
+    //var offset = {x:0,y:0};
     var scroll = {x:0, y:0,xoffset:0,yoffset:0};
     
     function hpoint(p){
-        return Math.floor(p / map.tile.width);
+        return Math.floor(p / twidth);
     }		
     function vpoint(p){
-        return Math.floor(p / map.tile.height);
+        return Math.floor(p / theight);
     }
     function cell(x, y){
         var h = hpoint(x);
@@ -32,41 +35,60 @@ var MapManager = function () {
         return (end-start) * amt+start;
     }
 
-    function render(zoom) {
-        var m = 0;
-        var p;
-        var mcols = map.dimensions.width;
-        var col = map.screen.width;
-        var row = map.screen.height;
-        Renderer.SetContext(1, 1);
-        for(var r=0; r < row; r++) {
-            for(var c = 0; c < col; c++) {
-                m = ((r+scroll.yoffset) * mcols) + (c+scroll.xoffset);
-                p = map.data[m];
-
-                var x = scroll.x+offset.x*zoom;
-                var y = scroll.y+offset.y*zoom;
-                Renderer.RawTile(
-                    (c * (map.tile.width*zoom)) + x, 
-                        (r * (map.tile.height*zoom)) + y,
-                        map.set + p,
-                        zoom);                    
-
-
-            } 
-        }
-    }
-
     function hitSomething(cell){
         return map.colliders.hit.indexOf(cell) != -1;
     }
 
     function scrollOffset() {
-        return {x:(scroll.xoffset*map.tile.width)-scroll.x,
-                y:(scroll.yoffset*map.tile.height)-scroll.y};
+        return {x:(scroll.xoffset*twidth)-scroll.x,
+                y:(scroll.yoffset*theight)-scroll.y};
+    }
+
+    function render() {
+        var m = 0;
+        var p;
+        var mcols = map.dimensions.width;
+        var col = map.screen.width+1;
+        var row = map.screen.height+1;
+        //Renderer.SetContext(1, 1);
+        for(var r=0; r < row; r++) {
+            for(var c = 0; c < col; c++) {
+                m = ((r+scroll.yoffset) * mcols) + (c+scroll.xoffset);
+                p = map.data[m];
+
+                    Renderer.Tile(
+                        (c * twidth) + (scroll.x),//+offset.x, 
+                        (r * theight) + (scroll.y),//+offset.y, 
+                        map.set + p, zoom);                    
+
+
+            } 
+        }
     }
     
     return {
+        ScrollTo: function(x, y){
+            var midx = ( map.screen.width*twidth) / 2;
+            var midy = ( map.screen.height*theight) / 2;
+            var maxx = (map.dimensions.width * twidth) - ( map.screen.width*twidth);
+            var maxy = (map.dimensions.height * theight) - ( map.screen.height*theight);
+
+            var cpx = (scroll.xoffset*twidth)-scroll.x;
+            var cpy = (scroll.yoffset*theight)-scroll.y;
+            var destx = lerp(cpx, (x-midx), 0.04);
+            var desty = lerp(cpy, (y-midy), 0.04);
+
+            if(destx > 0 && destx < maxx)
+            {
+                scroll.x = -destx % twidth;
+                scroll.xoffset = parseInt(destx / twidth);
+            }
+            if(desty > 0 && desty < maxy)
+            {
+                scroll.y = -desty % theight;
+                scroll.yoffset = parseInt(desty / theight);
+            }
+        },
         Hit: function(x, y){
             return hitSomething(content(x, y));
         },
@@ -138,31 +160,10 @@ var MapManager = function () {
             return clx;
         },
         ScrollOffset: function () {
-            return {x:(scroll.xoffset*map.tile.width)-scroll.x,
-                    y:(scroll.yoffset*map.tile.height)-scroll.y};
+
+            return {x:(scroll.xoffset*(map.tile.width))-scroll.x,
+                    y:(scroll.yoffset*(map.tile.height))-scroll.y};
         }, 
-        ScrollTo: function(x, y){
-            var midx = ( map.screen.width*map.tile.width) / 2;
-            var midy = ( map.screen.height*map.tile.height) / 2;
-            var maxx = (map.dimensions.width * map.tile.width) - ( map.screen.width*map.tile.width);
-            var maxy = (map.dimensions.height * map.tile.height) - ( map.screen.height*map.tile.height);
-
-            var cpx = (scroll.xoffset*map.tile.width)-scroll.x;
-            var cpy = (scroll.yoffset*map.tile.height)-scroll.y;
-            var destx = lerp(cpx, (x-midx), 0.04);
-            var desty = lerp(cpy, (y-midy), 0.04);
-
-            if(destx > 0 && destx < maxx)
-            {
-                scroll.x = -destx % map.tile.width;
-                scroll.xoffset = parseInt(destx / map.tile.width);
-            }
-            if(desty > 0 && desty < maxy)
-            {
-                scroll.y = -desty % map.tile.height;
-                scroll.yoffset = parseInt(desty / map.tile.height);
-            }
-        },
         Scroll: function(x, y){             
             var xt = map.tile.width;            
             var yt = map.tile.height;
@@ -198,8 +199,13 @@ var MapManager = function () {
             }    
             
         },
-        Render: function (layer) {
-            render(layer);            
-        }    
+        Render: function () {
+            render();            
+        },
+        SetZoom : function(z){
+            zoom = z;
+            twidth = map.tile.width * zoom;
+            theight = map.tile.height * zoom;
+        }
     }
 };

@@ -12,6 +12,7 @@ var Sprite = function () {
     }
 
     function render() {
+        //Renderer.Sprite(x, y, src, frame, false, scale);
         Renderer.Sprite(x, y, src, frame, scale, rotation, alpha);
     }
     return {
