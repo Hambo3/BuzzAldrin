@@ -90,6 +90,36 @@ var RenderingManager = function (ctx, options) {
        context.imageSmoothingEnabled = false;
     }
 
+    function init() {
+        var numAssets = spritesheet.length;
+
+        spritesheet.forEach(function(sheet) 
+        {
+            if(sheet.recol)
+            {
+                --numAssets;
+            }
+            else
+            {
+                var a = new Image();
+                a.src = sheet.src;
+                var tag = sheet.tag;
+                a.onload = function() { 
+                    assets[tag] = a;
+                    
+                    if(--numAssets == 0)
+                    {
+                        if(onReady){
+                            onReady();				
+                        }
+                    }
+                };
+            }
+
+        });
+       context.imageSmoothingEnabled = false;
+    }
+
     return {
         Init: function (options) {
 
