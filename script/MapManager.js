@@ -9,8 +9,8 @@ var MapManager = function () {
         data:[]
     };
     var zoom = 1;
-    var twidth = map.tile.width * zoom;
-    var theight = map.tile.height * zoom;
+    var twidth = map.tile.width;
+    var theight = map.tile.height;
     //var offset = {x:0,y:0};
     var scroll = {x:0, y:0,xoffset:0,yoffset:0};
     
@@ -48,18 +48,23 @@ var MapManager = function () {
         var m = 0;
         var p;
         var mcols = map.dimensions.width;
-        var col = map.screen.width+1;
-        var row = map.screen.height+1;
-        //Renderer.SetContext(1, 1);
+        var col = parseInt( ((map.screen.width+1)*twidth)/(twidth*zoom) );
+        var row = parseInt( ((map.screen.height+1)*twidth)/(twidth*zoom) );
+
+debug.Print("col:","["+col+"]["+row+"]");         
         for(var r=0; r < row; r++) {
             for(var c = 0; c < col; c++) {
                 m = ((r+scroll.yoffset) * mcols) + (c+scroll.xoffset);
                 p = map.data[m];
-
-                    Renderer.Tile(
-                        (c * twidth) + (scroll.x),//+offset.x, 
-                        (r * theight) + (scroll.y),//+offset.y, 
-                        map.set + p, zoom);                    
+try {
+                       Renderer.Tile(
+                    ((c * twidth) + (scroll.x))*zoom,//+offset.x, 
+                    ((r * theight) + (scroll.y))*zoom,//+offset.y, 
+                    map.set + p, zoom);   
+} catch (error) {
+   var x =zoom;
+}
+               
 
 
             } 
@@ -204,8 +209,8 @@ var MapManager = function () {
         },
         SetZoom : function(z){
             zoom = z;
-            twidth = map.tile.width * zoom;
-            theight = map.tile.height * zoom;
+            //twidth = map.tile.width * zoom;
+            //theight = map.tile.height * zoom;
         }
     }
 };

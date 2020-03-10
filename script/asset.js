@@ -56,8 +56,8 @@
 debug.Print("buzz:","["+this.x.toFixed(2)+"]["+this.y.toFixed(2)+"]");            
 			this.sprite.Update(dt, 
 				{
-					x:this.x-os.x, 
-					y:this.y-os.y, 
+					x:(this.x-os.x)*this.scale, 
+					y:(this.y-os.y)*this.scale, 
 					frame:this.frame, 					
                     src:this.currentAnim,
                     scale:this.scale,
