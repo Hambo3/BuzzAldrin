@@ -1,41 +1,26 @@
 (function() {
-    function Buzz(x, y, width, height, anims, initialAnim, r, s) {
+    function Buzz(x, y) {
  
 		this.enabled = true;
 
         this.x = x;
         this.y = y;
-        this.width = width;
-        this.height = height;
-        
-		this.anims = anims;
-        this.currentAnim = initialAnim;       
+  
 
-		this.scale = s;
+		this.scale = 1;
         this.rotation = 0;
-        this.rate = r;
-                
-        this.frame = 0;
-        this.frameNum = 0;
-		this.frameRate = 16;
 
         this.dx = 0;
         this.dy = 0;
-        
-        this.sprite = new Sprite();
-        this.sprite.Init(
-            {
-                src: this.currentAnim,
-                x:this.x,
-				y:this.y,
-				scale:this.scale
-            });  
+
+        this.body = Factory.Ship(1);
+
     };
 
     Buzz.prototype = {	
-        update: function(dt, z, os) {
+        update: function(dt) {
             //this.x += this.rate;
-            //this.rotation +=0.01;
+            this.rotation +=0.1;
             if(input.isDown('UP'))
             {
                 this.y -=1;
@@ -52,20 +37,18 @@
             {
                 this.x +=1;
             }
-            this.scale = z;
-debug.Print("buzz:","["+this.x.toFixed(2)+"]["+this.y.toFixed(2)+"]");            
-			this.sprite.Update(dt, 
-				{
-					x:(this.x-os.x)*this.scale, 
-					y:(this.y-os.y)*this.scale, 
-					frame:this.frame, 					
-                    src:this.currentAnim,
-                    scale:this.scale,
-                    rotation:this.rotation
-                });
+            if(input.isDown('X'))
+            {
+                this.scale += 0.01;
+            }
+            if(input.isDown('Z'))
+            {
+                this.scale -= 0.01;
+            }
+
         },
         render: function() {
-            this.sprite.Render();
+            Renderer.VectorSprite(this.x, this.y, this.body, this.rotation, this.scale);
 		}
     };
 

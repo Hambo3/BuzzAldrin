@@ -56,14 +56,12 @@ debug.Print("col:","["+col+"]["+row+"]");
             for(var c = 0; c < col; c++) {
                 m = ((r+scroll.yoffset) * mcols) + (c+scroll.xoffset);
                 p = map.data[m];
-try {
+
                        Renderer.Tile(
                     ((c * twidth) + (scroll.x))*zoom,//+offset.x, 
                     ((r * theight) + (scroll.y))*zoom,//+offset.y, 
                     map.set + p, zoom);   
-} catch (error) {
-   var x =zoom;
-}
+
                
 
 

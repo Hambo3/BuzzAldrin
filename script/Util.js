@@ -33,6 +33,20 @@ var ObjectPool = function () {
     }
 };
 
+var Factory = {
+    Ship: function (col){
+        return [
+            {col: PAL[col], pt: [{x:-32, y:-32},{x:32, y:-32},{x:32, y:32},{x:-32, y:32},{x:-32, y:-32}] }
+            ];
+    }
+};
+
+//pallette
+var PAL = [
+    "#000000",
+    "#FFFFFF"
+    ];
+
 var Const = {
     game:{
         friction:6,
