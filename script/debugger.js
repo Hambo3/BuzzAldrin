@@ -6,6 +6,7 @@ var Debug = function (options) {
 
     var lineht = 16;
     var lines = {};
+    var txtCol = '#FF0000';
 
     var width;
     var height;
@@ -59,14 +60,14 @@ var Debug = function (options) {
 
                 if(showFps == true){
                     //ctx.clearRect(0, y-lineht, width, lineht);
-                    ctx.fillStyle = '#000000';
+                    ctx.fillStyle = txtCol;
                     ctx.fillText(ShowFps(), x, y);
                     y+=lineht; 
                 }                
 
                 for (var key in lines) {
                     //ctx.clearRect(0, y-lineht, width, lineht);
-                    ctx.fillStyle = '#000000';
+                    ctx.fillStyle = txtCol;
                     ctx.fillText(key+":"+lines[key], x, y);
                     y+=lineht; 
                 }            

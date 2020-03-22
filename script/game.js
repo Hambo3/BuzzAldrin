@@ -98,7 +98,21 @@
     Game.prototype = {        
         Update: function(dt){
             this.buzz.update(dt);
-            //this.neil.update(dt, this.zoom, mp);
+            for (var b = 1; b < this.buzz.body[0].pt.length; b++) 
+            {
+                for (var i = 1; i < this.landscape.length; i++) {
+                    var x = Util.line_intersects(
+                        this.buzz.body[0].pt[b-1].x + this.buzz.x,
+                        this.buzz.body[0].pt[b-1].y + this.buzz.y,
+                        this.buzz.body[0].pt[b].x + this.buzz.x,
+                        this.buzz.body[0].pt[b].y + this.buzz.y,
+                        this.landscape[i-1].x,
+                        this.landscape[i-1].y,
+                        this.landscape[i].x,
+                        this.landscape[i].y);
+debug.Print("mode","["+x+"]"); 
+                }
+            }
         },
         Render: function(){   
             Renderer.Clear(25*32,19*32);
