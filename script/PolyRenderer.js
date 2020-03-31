@@ -1,6 +1,6 @@
 //handles loading and keeps track of all graphics
 //performs all rendering operations
-var PolyRenderer = function (context, screen, border) {
+var PolyRenderer = function (context, screen) {
     var ctx = context;
     var scale = 1;
     var bounds = null;
@@ -11,14 +11,7 @@ var PolyRenderer = function (context, screen, border) {
             minx:0, 
             maxx:screen.w, 
             miny:0,
-            maxy:screen.h};
-    
-        if(border){
-            bounds.minx -= border.x1,
-            bounds.maxx += border.x2,
-            bounds.miny -= border.y1,
-            bounds.maxy += border.y2
-        };    
+            maxy:screen.h};     
     }
 
     function PT(p){
@@ -86,14 +79,14 @@ var PolyRenderer = function (context, screen, border) {
         ctx.stroke();
     }
 
-    function vectorLine(poly, col){
+    function vectorLine(poly, col, start, scale){
         ctx.strokeStyle = col;
         ctx.beginPath();
 
-        ctx.moveTo(poly[0].x, poly[0].y);
+        ctx.moveTo((poly[0].x - start.x) * scale, (poly[0].y - start.y) * scale);
 
         for(var p = 1; p < poly.length; p++) {
-            ctx.lineTo(poly[p].x, poly[p].y);  
+            ctx.lineTo((poly[p].x - start.x) * scale, (poly[p].y - start.y) * scale);  
         }
         ctx.stroke();
     }
@@ -107,14 +100,14 @@ var PolyRenderer = function (context, screen, border) {
         },   
         VectorSprite: function(x, y, poly, a, s){
             scale = s;
-            if(inBounds(x,y)) {
+            //if(inBounds(x,y)) {
                 vector(x, y, poly, a);    
                 return 1;
-            }
-            return 0;
+            //}
+            //return 0;
         }, 
-        VectorLine: function(poly, col){
-            vectorLine(poly, col);
+        VectorLine: function(poly, col, start, scale){
+            vectorLine(poly, col, start, scale);
         }            
     }
 };

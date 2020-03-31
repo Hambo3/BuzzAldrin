@@ -13,42 +13,53 @@
         this.dx = 0;
         this.dy = 0;
 
-        this.body = Factory.Ship(1);
+        this.body = Util.Scale(Factory.Ship(1), 1);
+        this.ptcache = Util.Scale(Factory.Ship(1), 1);
 
     };
 
     Buzz.prototype = {	
-        update: function(dt) {
+        update: function(dt, scale) {
             //this.x += this.rate;
-            this.rotation +=0.1;
+            this.scale = scale;
             if(input.isDown('UP'))
             {
-                this.y -=1;
+                this.y -=5;
             }
             if(input.isDown('DOWN'))
             {
-                this.y +=1;
+                this.y +=5;
             }
             if(input.isDown('LEFT'))
             {
-                this.x -=1;
+                this.x -=5;
             }
             if(input.isDown('RIGHT'))
             {
-                this.x +=1;
-            }
-            if(input.isDown('X'))
-            {
-                this.scale += 0.01;
-            }
-            if(input.isDown('Z'))
-            {
-                this.scale -= 0.01;
+                this.x +=5;
             }
 
+            if(input.isDown('A'))
+            {
+                this.rotation -= 0.2;
+            }
+            if(input.isDown('D'))
+            {
+                this.rotation += 0.2;
+            }
+
+            var pts = [];
+            for(var b = 0; b < this.body.length; b++) {
+                pts = [];
+                for(var i = 0; i < this.body[b].pt.length; i++) {
+                    var pt = Util.RotatePoint(this.body[b].pt[i].x, this.body[b].pt[i].y, this.rotation);
+                    pts.push(pt);
+                }  
+                this.ptcache[b].pt = pts;
+            }
         },
-        render: function() {
-            Renderer.VectorSprite(this.x, this.y, this.body, this.rotation, this.scale);
+        render: function(os) {
+            Renderer.VectorSprite(this.x-os.x, this.y-os.y, this.ptcache, 0, this.scale);
 		}
     };
 

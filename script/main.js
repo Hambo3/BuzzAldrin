@@ -29,8 +29,7 @@ var Renderer;
 
 //map definition and levels
 var map = {
-		tile:{width:32, height:32},
-		screen:{width:25, height:19}		
+		screen:{width:800, height:600}		
 };
 
 /*****************************/
@@ -44,20 +43,18 @@ function Start(canvasBody)
 	if(canvas.getContext)
 	{
 		ctx = canvas.getContext("2d");
-		canvas.width = (map.screen.width * map.tile.width);
-		canvas.height = (map.screen.height * map.tile.height);
+		canvas.width = map.screen.width;
+		canvas.height = map.screen.height;
 
 		var b = document.getElementById(canvasBody);
     	b.appendChild(canvas);
 
 		//everything is drawn by this renderer
-		Renderer = new PolyRenderer(ctx, {w:canvas.width, h:canvas.height}, 
-			{x1:32,x2:32, y1:32,y2:96});
+		Renderer = new PolyRenderer(ctx, {w:canvas.width, h:canvas.height});
 
 		debug = new Debug({ctx:ctx});	
 
 		init();
-
 	}
 }
 
