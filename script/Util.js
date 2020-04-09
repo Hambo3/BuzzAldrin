@@ -1,5 +1,13 @@
 var Util = {
 
+    // Converts from degrees to radians.
+    Radians: function(degrees) {
+        return degrees * Math.PI / 180;
+    },    
+    // Converts from radians to degrees.
+    Degrees: function(radians) {
+        return radians * 180 / Math.PI;
+    },
     line_intersects: function( a,  b,  c,  d)
     {
         var s1_x, s1_y, s2_x, s2_y;
@@ -58,29 +66,46 @@ var Util = {
         }
         return poly;
     },
-    ScrollTo: function(x, y, screen, map, offset){
+    ScrollTo: function(x, y, screen, map, offset, lerp){
         var midx = screen.width / 2;
         var midy = screen.height / 2;
         var maxx = map.width - screen.width;
         var maxy = map.height - screen.height;
 
-        //var destx = (x-midx);//Util.Lerp(offset.x, (x-midx), 0.04);
-        //var desty = (y-midy);//Util.Lerp(offset.y, (y-midy), 0.04);
-        var destx = Util.Lerp(offset.x, (x-midx), 0.04);
-        var desty = Util.Lerp(offset.y, (y-midy), 0.04);
+        var destx = (x-midx);
+        var desty = (y-midy);
 
-        if(destx > 0 && destx < maxx)
-        {
-            offset.x = destx;
-            //scroll.x = -destx % twidth;
-            //scroll.xoffset = parseInt(destx / twidth);
+        if(lerp){
+            destx = Util.Lerp(offset.x, destx, 0.04);
+            desty = Util.Lerp(offset.y, desty, 0.04);
         }
-        if(desty > 0 && desty < maxy)
-        {
-            offset.y = desty;
-            //scroll.y = -desty % theight;
-            //scroll.yoffset = parseInt(desty / theight);
+
+        if(destx > 0){
+            if(destx < maxx)
+            {
+                offset.x = destx;
+            }
+            else{
+                offset.x = maxx;
+            }            
         }
+        else{
+            offset.x = 0;
+        }
+
+        if(desty > 0){
+            if(desty < maxy)
+            {
+                offset.y = desty;
+            }
+            else{
+                offset.y = maxy;
+            }            
+        }
+        else{
+            offset.y = 0;
+        }
+
         return offset;
     },
 }
@@ -270,7 +295,8 @@ var Factory = {
             {col: PAL[col], pt: [{x:-13, y:17},{x:-17, y:17},{x:-15, y:16},{x:-10, y:6},{x:11, y:6},{x:16,y:16},{x:18,y:17},{x:14,y:17}] },
             {col: PAL[col], pt: [{x:-5, y:6},{x:-8, y:14},{x:9, y:14},{x:5, y:6}] },
             {col: PAL[col], pt: [{x:-10, y:6},{x:-10, y:2},{x:11, y:2},{x:11, y:6}] },
-            {col: PAL[col], pt: [{x:-4, y:1},{x:-10, y:-4},{x:-10, y:-11},{x:-3, y:-18}, {x:4, y:-18},{x:11, y:-11},{x:11, y:-4},{x:5, y:1}] }
+            {col: PAL[col], pt: [{x:-4, y:1},{x:-10, y:-4},{x:-10, y:-11},{x:-3, y:-18}, {x:4, y:-18},{x:11, y:-11},{x:11, y:-4},{x:5, y:1}] },
+            {col: PAL[col], pt: [{x:-8, y:14},{x:0, y:24},{x:9, y:14}] }
             ];
     }
 };

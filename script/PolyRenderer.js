@@ -83,10 +83,10 @@ var PolyRenderer = function (context, screen) {
         ctx.strokeStyle = col;
         ctx.beginPath();
 
-        ctx.moveTo((poly[0].x - start.x) * scale, (poly[0].y - start.y) * scale);
+        ctx.moveTo((poly[0].x * scale) - start.x, (poly[0].y * scale) - start.y);
 
         for(var p = 1; p < poly.length; p++) {
-            ctx.lineTo((poly[p].x - start.x) * scale, (poly[p].y - start.y) * scale);  
+            ctx.lineTo((poly[p].x * scale) - start.x , (poly[p].y * scale)- start.y);  
         }
         ctx.stroke();
     }
@@ -108,6 +108,12 @@ var PolyRenderer = function (context, screen) {
         }, 
         VectorLine: function(poly, col, start, scale){
             vectorLine(poly, col, start, scale);
-        }            
+        },
+        DrawText: function(txt, x, y){
+            context.font = "12px Arial";
+            context.fillStyle = "#ffffff";
+            //context.textAlign = "center";
+            context.fillText(txt, x, y);
+        }             
     }
 };

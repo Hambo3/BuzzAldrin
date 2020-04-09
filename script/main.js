@@ -1,7 +1,16 @@
 /* Resources
 https://stackoverflow.com/questions/2432561/rotate-point-in-rectangle
 
+velocity_X = velocity*cos(angle)
+velocity_Y = velocity*sin(angle)
 
+calculateAngle: function() {
+              sinAngle = Math.sin(this.anims.idle.angle);
+              cosAngle = Math.cos(this.anims.idle.angle);
+              bulletX = (this.pos.x + this.halfWidth) + (47 * sinAngle);
+              bulletY = (this.pos.y + 47) - (47 * cosAngle);
+              return {x: bulletX, y: bulletY, sin: sinAngle, cos: cosAngle};
+  },
 */
 
 
