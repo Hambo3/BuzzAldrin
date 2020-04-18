@@ -7,7 +7,6 @@
     function pressed(e, status) {
         var k = setKey(e, status);
         pressedKeys[k] = status;
-        return k;
     }
 
     function released(e, status) {
@@ -45,7 +44,8 @@
     });
 
     document.addEventListener('keyup', function(e) {
-        var k = pressed(e, false);
+        //var k = setKey(e, false);
+        pressed(e, false);
         released(e, true);
         if (keyUpevent) {
             keyUpevent(k);
@@ -65,10 +65,8 @@
         },
         isUp: function(key) {
             var k = releasedKeys[key.toUpperCase()];
+            releasedKeys[key] = false;
             return k;
-        },
-        Clr: function() {
-            releasedKeys = [];
         }
     };
 })();

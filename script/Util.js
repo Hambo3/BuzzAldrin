@@ -8,6 +8,11 @@ var Util = {
     Degrees: function(radians) {
         return radians * 180 / Math.PI;
     },
+    Distance: function(x1, y1, x2, y2){
+        var x = x2 - x1;
+        var y = y2 - y1;
+        return Math.sqrt(x*x + y*y);
+    },
     line_intersects: function( a,  b,  c,  d)
     {
         var s1_x, s1_y, s2_x, s2_y;
@@ -48,6 +53,9 @@ var Util = {
         // return coordinates relative to top left corner
         return { x: dx2 + centerX, y: dy2 + centerY };
     },
+    Rndf: function (min, max){
+        return (Math.random() * (max-min)) + min;
+    }, 
     Rnd: function (min, max){
         return parseInt(Math.random() * (max-min)) + min;
     }, 
@@ -290,13 +298,25 @@ var Factory = {
 
         return b;
     },
-    Ship: function (col, scale){
+    LEM: function (col, scale){
         return [
-            {col: PAL[col], pt: [{x:-13, y:17},{x:-17, y:17},{x:-15, y:16},{x:-10, y:6},{x:11, y:6},{x:16,y:16},{x:18,y:17},{x:14,y:17}] },
-            {col: PAL[col], pt: [{x:-5, y:6},{x:-8, y:14},{x:9, y:14},{x:5, y:6}] },
-            {col: PAL[col], pt: [{x:-10, y:6},{x:-10, y:2},{x:11, y:2},{x:11, y:6}] },
-            {col: PAL[col], pt: [{x:-4, y:1},{x:-10, y:-4},{x:-10, y:-11},{x:-3, y:-18}, {x:4, y:-18},{x:11, y:-11},{x:11, y:-4},{x:5, y:1}] },
-            {col: PAL[col], pt: [{x:-8, y:14},{x:0, y:24},{x:9, y:14}] }
+            {col: PAL[col], pt: [{x:-14, y:17},{x:-18, y:17},{x:-16, y:16},{x:-11, y:6}] },
+            {col: PAL[col], pt: [{x:14,y:17},{x:18,y:17},{x:16,y:16},{x:11, y:6}] },                
+            {col: PAL[col], pt: [{x:-6, y:6},{x:-9, y:14},{x:9, y:14},{x:5, y:6}] },
+            {col: PAL[col], pt: [{x:-11, y:6},{x:-11, y:2},{x:11, y:2},{x:11, y:6},{x:-11, y:6}] },
+            {col: PAL[col], pt: [{x:-5, y:1},{x:-11, y:-4},{x:-11, y:-11},{x:-4, y:-18}, {x:4, y:-18},{x:11, y:-11},{x:11, y:-4},{x:5, y:1},{x:-5, y:1}] },
+            
+            {col: PAL[col], pt: [{x:-16, y:18},{x:-16, y:16}] },//left foot
+            {col: PAL[col], pt: [{x:16, y:18},{x:16, y:16}] },  //right foot
+
+            {col: PAL[col], pt: [{x:-9, y:14},{x:0, y:24},{x:9, y:14}] }//flame
+            ];
+    },
+    Orbiter: function (col, scale){
+        return [
+            {col: PAL[col], pt: [{x:-13, y:19},{x:-13, y:-14},{x:13, y:-14},{x:13, y:19},{x:-13,y:19}] },
+            {col: PAL[col], pt: [{x:-13, y:19},{x:-4, y:31},{x:4, y:31},{x:13,y:19}] },
+            {col: PAL[col], pt: [{x:-4, y:-14},{x:-9, y:-31},{x:9, y:-31},{x:4,y:-14}] }
             ];
     }
 };
@@ -304,33 +324,21 @@ var Factory = {
 //pallette
 var PAL = [
     "#000000",
-    "#FFFFFF"
+    "#FFFFFF",
+    "#555555"
     ];
 
 var Const = {
-    game:{
-        friction:6,
-        mobFont:"12px Arial",
-        h1Font:"bold 48px Arial",
-        h2Font:"24px Arial",
-        h3Font:"16px Arial"
+    State:{
+        disabled:0,
+        enabled:1,
+        crashed:2,
+        landed:3
     },
-    actors:{
-        player:1,
-        shopr: 2,
-        troll: 3,
-        hater: 4,
-    },
-    txts:{
-        msgs:[
-        'At the mall, lol',
-        'Really need the loo',
-        'Ive been here for ages',
-        'Just seen @BrianHambo3',
-        'Need a charge point, lol',
-        'Outside Pret lol',
-        'Going to get new shoes',
-        'Where can I get a doughnut',
-        'I always wanted to be a lumberjack']
+    GameState:{
+        title:0,
+        buzzActive:1,
+        buzzFail:2,
+        buzzSuccess:3
     }
 }

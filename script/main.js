@@ -33,8 +33,10 @@ var fps = 60;
 var step = 1 / fps;
 
 var gameAsset;
+var titleAsset;
 var Renderer;
 
+var state = Const.GameState.title;
 
 //map definition and levels
 var map = {
@@ -73,6 +75,9 @@ function init()
 	lastTime = now;
 	
 	gameAsset = new Game(map);
+	titleAsset = new Title();
+	gameAsset.active = false;
+	titleAsset.active = true;
 	FixedLoop();  
 }
 
@@ -97,11 +102,32 @@ function timestamp() {
 
 // Update game objects
 function update(dt) {
+	if(state == Const.GameState.title){
+
+		if(titleAsset.state != 0){
+			if(titleAsset.state == 1){
+				gameAsset.Start();	
+				titleAsset.state = 0;
+				state = Const.GameState.buzzActive;	
+			}
+		}
+	}
+	else if(state == Const.GameState.buzzActive){
+		if(!gameAsset.active){
+			gameAsset.Stop();	
+			titleAsset.state = 0;
+			titleAsset.active = true;
+			state = Const.GameState.title;	
+		}
+	}
+
 	gameAsset.Update(dt);
+	titleAsset.Update(dt);
 };
 
 function render() {	
 	gameAsset.Render();
+	titleAsset.Render();
 };
 
 window.onload = function() {
