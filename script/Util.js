@@ -53,6 +53,19 @@ var Util = {
         // return coordinates relative to top left corner
         return { x: dx2 + centerX, y: dy2 + centerY };
     },
+    ArrayFirst: function(arr, index) {
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i].index == index)
+                return true;
+        }    
+        return false;
+    },
+    OneIn: function(c){
+        return Util.Rnd(0,c)==0;
+    },
+    OneOf: function(arr){
+        return arr[Util.Rnd(0,arr.length)];
+    },
     Rndf: function (min, max){
         return (Math.random() * (max-min)) + min;
     }, 
@@ -62,6 +75,10 @@ var Util = {
     Lerp: function(start, end, amt)
     {
         return (end-start) * amt+start;
+    },
+    SLerp: function(start, end, amt)
+    {
+        return ((start+amt) < end) ? start+amt : end;
     },
     Scale: function(src, sc)    //scales a factory item
     {
@@ -143,6 +160,26 @@ var ObjectPool = function () {
 };
 
 var Factory = {
+    RightArrow: function (col){
+        return [
+            {col: PAL[col], pt: [{x:0, y:0},{x:0, y:5},{x:9, y:0},{x:0, y:-5},{x:0, y:0},{x:-19, y:0}] }
+            ];
+    },
+    LeftArrow: function (col){
+        return [
+            {col: PAL[col], pt: [{x:0, y:0},{x:0, y:5},{x:-9, y:0},{x:0, y:-5},{x:0, y:0},{x:19, y:0}] }
+            ];
+    },
+    UpArrow: function (col){
+        return [
+            {col: PAL[col], pt: [{x:0, y:0},{x:5, y:0},{x:0, y:-9},{x:-5, y:0},{x:0, y:0},{x:0, y:19}] }
+            ];
+    },
+    DownArrow: function (col){
+        return [
+            {col: PAL[col], pt: [{x:0, y:0},{x:5, y:0},{x:0, y:9},{x:-5, y:0},{x:0, y:0},{x:0, y:-19}] }
+            ];
+    },
     Box: function (col){
         return [
             {col: PAL[col], pt: [{x:-16, y:-16},{x:16, y:-16},{x:16, y:16},{x:-16, y:16},{x:-16, y:-16}] }
@@ -194,8 +231,8 @@ var Factory = {
             {x:153,y:83},
             {x:157,y:95},
             {x:157,y:101},
-            {x:162,y:106},
-            {x:172,y:106},
+            {x:161,y:106},//46
+            {x:173,y:106},//46
             {x:183,y:92},
             {x:183,y:95},
             {x:190,y:83},
@@ -220,8 +257,8 @@ var Factory = {
             {x:266,y:-71},
             {x:269,y:-71},
             {x:271,y:-77},
-            {x:275,y:-82},
-            {x:280,y:-82},
+            {x:272,y:-82},//72
+            {x:280,y:-82},//72
             {x:281,y:-77},
             {x:286,y:-77},
             {x:287,y:-72},
@@ -237,8 +274,8 @@ var Factory = {
             {x:330,y:-9},
             {x:334,y:-5},
             {x:339,y:-5},
-            {x:343,y:29},
-            {x:348,y:29},
+            {x:342,y:29},//89
+            {x:350,y:29},//89
             {x:350,y:34},
             {x:354,y:40},
             {x:356,y:49},
@@ -251,8 +288,8 @@ var Factory = {
             {x:373,y:101},
             {x:378,y:101},
             {x:380,y:111},
-            {x:393,y:125},
-            {x:432,y:125},
+            {x:393,y:125},//103
+            {x:432,y:125},//103
             {x:434,y:109},
             {x:439,y:101},
             {x:442,y:91},
@@ -268,8 +305,8 @@ var Factory = {
             {x:500,y:120},
             {x:512,y:120},
             {x:521,y:121},
-            {x:530,y:125},
-            {x:549,y:125},
+            {x:530,y:125},//120
+            {x:549,y:125},//120
             {x:553,y:109},
             {x:554,y:91},
             {x:559,y:91},
@@ -281,14 +318,14 @@ var Factory = {
             {x:583,y:43},
             {x:588,y:38},
             {x:589,y:38},
-            {x:594,y:43},
-            {x:603,y:43},
+            {x:592,y:43},//133
+            {x:604,y:43},//133
             {x:608,y:38},
             {x:609,y:28},
             {x:613,y:17},
             {x:618,y:14},
             {x:619,y:10},
-            {x:627,y:1},
+            {x:627,y:1}
             ];
 
         b.forEach(t => {
@@ -298,7 +335,93 @@ var Factory = {
 
         return b;
     },
-    LEM: function (col, scale){
+    BuzzTerrain: function(scale, oy){
+        var b = [{x:0,y:0},
+            {x:5,y:0},
+            {x:16,y:9},
+            {x:23,y:18},
+            {x:23,y:28},
+            {x:26,y:31},
+            {x:30,y:34},
+            {x:43,y:35},
+            {x:48,y:39},
+            {x:51,y:44},
+            {x:53,y:51},
+            {x:56,y:54},
+            {x:60,y:56},
+            {x:67,y:56},
+            {x:68,y:57},
+            {x:82,y:57},
+            {x:93,y:52},
+            {x:111,y:37},
+            {x:113,y:36},
+            {x:122,y:36},
+            {x:128,y:40},
+            {x:131,y:50},
+            {x:133,y:55},
+            {x:144,y:69},
+            {x:149,y:80},
+            {x:152,y:100},
+            {x:158,y:106},
+            {x:179,y:106},
+            {x:190,y:96},
+            {x:203,y:85},
+            {x:215,y:67},
+            {x:224,y:57},
+            {x:231,y:51},
+            {x:240,y:32},
+            {x:250,y:17},
+            {x:256,y:18},
+            {x:267,y:26},
+            {x:281,y:32},
+            {x:303,y:31},
+            {x:323,y:22},
+            {x:338,y:21},
+            {x:368,y:52},
+            {x:375,y:89},
+            {x:393,y:125},
+            {x:432,y:125},
+            {x:437,y:95},
+            {x:456,y:72},
+            {x:469,y:64},
+            {x:493,y:60},
+            {x:507,y:53},
+            {x:514,y:55},
+            {x:529,y:99},
+            {x:560,y:99},
+            {x:580,y:76},
+            {x:585,y:60},
+            {x:591,y:54},
+            {x:600,y:54},
+            {x:608,y:56},
+            {x:615,y:52},
+            {x:627,y:20},
+        ];
+
+        b.forEach(t => {
+            t.x *= scale;
+            t.y = (t.y * scale) + oy;
+        });
+
+        return b;
+    },
+    HelpTerrain: function(){
+
+        var b =[{x:191, y:399},
+                {x:199, y:417},
+                {x:260, y:456},
+                {x:262, y:496},
+                {x:273, y:520},
+                {x:296, y:535},
+                {x:503, y:535},
+                {x:535, y:477},
+                {x:564, y:453},
+                {x:577, y:415},
+                {x:642, y:394}
+                ];
+                return b;        
+    },
+    LEM: function (col){
         return [
             {col: PAL[col], pt: [{x:-14, y:17},{x:-18, y:17},{x:-16, y:16},{x:-11, y:6}] },
             {col: PAL[col], pt: [{x:14,y:17},{x:18,y:17},{x:16,y:16},{x:11, y:6}] },                
@@ -306,18 +429,44 @@ var Factory = {
             {col: PAL[col], pt: [{x:-11, y:6},{x:-11, y:2},{x:11, y:2},{x:11, y:6},{x:-11, y:6}] },
             {col: PAL[col], pt: [{x:-5, y:1},{x:-11, y:-4},{x:-11, y:-11},{x:-4, y:-18}, {x:4, y:-18},{x:11, y:-11},{x:11, y:-4},{x:5, y:1},{x:-5, y:1}] },
             
-            {col: PAL[col], pt: [{x:-16, y:18},{x:-16, y:16}] },//left foot
-            {col: PAL[col], pt: [{x:16, y:18},{x:16, y:16}] },  //right foot
+            {col: PAL[0], pt: [{x:-16, y:18},{x:-16, y:16}] },//left foot
+            {col: PAL[0], pt: [{x:16, y:18},{x:16, y:16}] },  //right foot
 
-            {col: PAL[col], pt: [{x:-9, y:14},{x:0, y:24},{x:9, y:14}] }//flame
+            {col: PAL[col], pt: [{x:-9, y:14},{x:0, y:14},{x:9, y:14}] }//flame
             ];
     },
-    Orbiter: function (col, scale){
-        return [
+    Orbiter: function (col, y){
+        var b = [
             {col: PAL[col], pt: [{x:-13, y:19},{x:-13, y:-14},{x:13, y:-14},{x:13, y:19},{x:-13,y:19}] },
             {col: PAL[col], pt: [{x:-13, y:19},{x:-4, y:31},{x:4, y:31},{x:13,y:19}] },
             {col: PAL[col], pt: [{x:-4, y:-14},{x:-9, y:-31},{x:9, y:-31},{x:4,y:-14}] }
             ];
+
+        b.forEach(t => {
+            t.pt.forEach(p => {
+                p.y += y;
+            });
+        });
+
+        return b;
+    },
+    Buzz: function (col, scale){
+        return [
+            {col: PAL[col], pt: [ {x:-3, y:5}, {x:-7, y:12}, {x:-7, y:17}, {x:-15, y:17}, {x:-16, y:16}, {x:-16, y:14}, {x:-15, y:13}, {x:-12, y:13}, {x:-10, y:4}, {x:-6, y:-1}, {x:-6, y:-10}, {x:-10, y:-8}, {x:-10, y:-3}, {x:-11, y:-2}, 
+                {x:-13, y:-2}, {x:-14, y:-3},  {x:-14, y:-10}, {x:-9, y:-15}, {x:-5, y:-15},           
+                {x:5, y:-15}, {x:9, y:-15},  {x:14, y:-10}, {x:14, y:-3}, {x:13, y:-2}, {x:11, y:-2}, {x:10, y:-3}, {x:10, y:-8}, {x:6, y:-10}, {x:6, y:-1}, {x:10, y:4},
+                {x:12, y:13}, {x:15, y:13}, {x:16, y:14}, {x:16, y:16}, {x:15, y:17}, {x:7, y:17}, {x:7, y:12},{x:3, y:5}, {x:-3, y:5}
+            ]},
+            {col: PAL[col], pt:[{x:-3, y:-15}, {x:-5, y:-17}, {x:-5, y:-22}, {x:-4, y:-23}, {x:-3, y:-24}, {x:3, y:-24} ,{x:4, y:-23}, {x:5, y:-22}, {x:5, y:-17}, {x:3, y:-15}, {x:-3, y:-15}]},
+            {col: PAL[col], pt: [{x:-2, y:-17},{x:-3, y:-18},{x:-3, y:-20},{x:-2, y:-21}, {x:2, y:-21},{x:3, y:-20},{x:3, y:-18},{x:2, y:-17},{x:-2, y:-17}] },
+
+            {col: PAL[0], pt: [{x:-11, y:18},{x:-11, y:16}] },//left foot
+            {col: PAL[0], pt: [{x:11, y:18},{x:11, y:16}] },  //right foot
+
+            {col: PAL[col], pt: [{x:-2, y:8},{x:-7, y:22}] },//flame 
+            {col: PAL[col], pt: [{x:0, y:11},{x:-1, y:21}] },//flame 
+            {col: PAL[col], pt: [{x:2, y:8},{x:7, y:21}] }//flame 
+        ];
     }
 };
 
@@ -325,20 +474,42 @@ var Factory = {
 var PAL = [
     "#000000",
     "#FFFFFF",
-    "#555555"
+    "#EEEEEE",
+    "#DDDDDD",
+    "#CCCCCC",
+    "#BBBBBB",
+    "#AAAAAA",
+    "#999999",
+    "#888888",
+    "#777777",
+    "#666666",
+    "#555555",
+    "#444444",
+    "#333333",
+    "#222222",
+    "#111111",
+    "#000000"
     ];
+
 
 var Const = {
     State:{
         disabled:0,
         enabled:1,
         crashed:2,
-        landed:3
+        landed:3,
+        finished:4
     },
     GameState:{
         title:0,
         buzzActive:1,
         buzzFail:2,
         buzzSuccess:3
+    },
+    Sound:{
+        crash:0,
+        thrust:1,
+        ambient:2,
+        farts:3
     }
 }

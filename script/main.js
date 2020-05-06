@@ -33,15 +33,42 @@ var fps = 60;
 var step = 1 / fps;
 
 var gameAsset;
-var titleAsset;
+
 var Renderer;
 
 var state = Const.GameState.title;
 
 //map definition and levels
-var map = {
-		screen:{width:800, height:600}		
+var map= {
+	screen:{width:800, height:600},
+	maps:
+	[
+		{
+			screen: {width:800, height:600},
+			terrain: Factory.BuzzTerrain(8, 2457),
+			safeZones:        
+				[
+					{index:27, rate:3},
+					{index:44, rate:2},
+					{index:52, rate:3}
+				]		
+		},
+		{
+			screen: {width:800, height:600},
+			terrain: Factory.Terrain(8, 2457),
+			safeZones:        
+				[
+					{index:46, rate:3},
+					{index:72, rate:5},
+					{index:89, rate:5},
+					{index:103, rate:2},
+					{index:120, rate:2},
+					{index:133, rate:3}
+				]		
+		}
+	]
 };
+
 
 /*****************************/
 var ctx;
@@ -62,11 +89,61 @@ function Start(canvasBody)
 
 		//everything is drawn by this renderer
 		Renderer = new PolyRenderer(ctx, {w:canvas.width, h:canvas.height});
+		Sound = new AudioManager(
+			[
+				{
+					key:Const.Sound.crash,
+					src:"audio/collision.wav",
+					type:"play"
+				},
+				{
+					key:Const.Sound.thrust,
+					src:"audio/thrust.wav",
+					type:"play"
+				},
+				{
+					key:Const.Sound.ambient,
+					src:"audio/ambient.wav",
+					type:"loop"
+				},
+				{
+					key:Const.Sound.farts,
+					src:[
+						"audio/fart1.wav",
+						"audio/fart2.wav",
+						"audio/fart3.wav",
+						"audio/fart4.wav",
+						"audio/fart5.wav",
+						"audio/fart6.wav",
+						"audio/fart7.wav",
+						"audio/fart8.wav",
+						"audio/fart9.wav",
+						"audio/fart10.wav",
+						"audio/fart11.wav",
+						"audio/fart12.wav",
+						"audio/fart13.wav"
+					],
+					type:"sequence"
+				}				
+			]);
 
-		debug = new Debug({ctx:ctx});	
+		debug = new Debug({ctx:ctx});
 
 		init();
 	}
+}
+
+function GameStart(type){
+	if(type==2){
+		gameAsset = new BuzzIntro(GameStart);
+	}
+	else{
+		gameAsset = new Game(map.maps[type], type, TitleScreen);
+	}
+}
+
+function TitleScreen(){
+	gameAsset = new Title(GameStart, 2);
 }
 
 function init()
@@ -74,10 +151,8 @@ function init()
   var now = timestamp();	
 	lastTime = now;
 	
-	gameAsset = new Game(map);
-	titleAsset = new Title();
-	gameAsset.active = false;
-	titleAsset.active = true;
+	gameAsset = new Title(GameStart, 0);
+
 	FixedLoop();  
 }
 
@@ -102,32 +177,11 @@ function timestamp() {
 
 // Update game objects
 function update(dt) {
-	if(state == Const.GameState.title){
-
-		if(titleAsset.state != 0){
-			if(titleAsset.state == 1){
-				gameAsset.Start();	
-				titleAsset.state = 0;
-				state = Const.GameState.buzzActive;	
-			}
-		}
-	}
-	else if(state == Const.GameState.buzzActive){
-		if(!gameAsset.active){
-			gameAsset.Stop();	
-			titleAsset.state = 0;
-			titleAsset.active = true;
-			state = Const.GameState.title;	
-		}
-	}
-
 	gameAsset.Update(dt);
-	titleAsset.Update(dt);
 };
 
 function render() {	
 	gameAsset.Render();
-	titleAsset.Render();
 };
 
 window.onload = function() {

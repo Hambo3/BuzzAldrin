@@ -165,14 +165,11 @@ var RenderingManager = function (ctx, options) {
         },
         Sprite: function(x, y, sprite, frame, scale, rotate, alpha){
             RenderSprite(x, y, sprite, frame, false, scale);
-            //DrawSprite(x, y, sprite, frame, scale, rotate, alpha);
         },
         Tile: function(x, y, sprite,z){
-            //context.setTransform(1, 0, 0, 1, 0, 0);
             RenderSprite(x, y, sprite, 0, false, z);
         },
         RawTile: function(x, y, sprite){
-            //RenderSprite(x, y, sprite, 0, false);
             DrawSprite(x, y, sprite, 0, 4, 0, 1);
         },
         DrawBox: function(box, fill, pen, r, a){

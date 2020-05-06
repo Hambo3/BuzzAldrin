@@ -109,9 +109,9 @@ var PolyRenderer = function (context, screen) {
         VectorLine: function(poly, col, start, scale){
             vectorLine(poly, col, start, scale);
         },
-        DrawText: function(txt, x, y, font){
+        DrawText: function(txt, x, y, col, font){
             context.font = font || "12px Arial";
-            context.fillStyle = "#ffffff";
+            context.fillStyle = col ? col : PAL[1];
             //context.textAlign = "center";
             context.fillText(txt, x, y);
         }             
