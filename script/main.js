@@ -116,7 +116,6 @@ function Start(canvasBody)
 						"audio/fart5.wav",
 						"audio/fart6.wav",
 						"audio/fart7.wav",
-						"audio/fart8.wav",
 						"audio/fart9.wav",
 						"audio/fart10.wav",
 						"audio/fart11.wav",

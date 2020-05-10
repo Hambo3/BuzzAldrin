@@ -23,9 +23,12 @@
         this.celebrations = 
         [
             {
-                success:["YOU MADE IT BUZZ"],
+                success:["YOU MADE IT BUZZ",
+                        "BUZZ ALDRIN FIRST MAN ON THE MOON"],
                 fail:[   
-                    "YOU BROKE EVERY BONE IN YOUR BODY BUZZ"
+                    "YOU BROKE EVERY BONE IN YOUR BODY",
+                    "THAT DIDNT QUITE WORK OUT THEN BUZZ",
+                    "NEIL ARMSTONG BECOMES THE FIRST MAN ON THE MOON"
                     ]
             },
             {
@@ -38,12 +41,12 @@
             }            
         ];
 
-        this.buzz = new Buzz( 1500, 500, 0.07, 0.03, (type == 0) ? 300: 270,
+        this.buzz = new Buzz( 1500, 500, 0.07, 0.02, (type == 0) ? 300: 270,
             this.gameType, 
             this.celebrations[this.gameType],
             levelMap.safeZones);
 
-        this.LM = (type == 0) ? new LM(1300, 400, -120 ,20, 4.5) : null;
+        this.LM = (type == 0) ? new LM(1300, 400, -120 ,20, 6.5) : null;
 
         this.panel = new Panel(type);
         if(type == 1)
@@ -79,8 +82,10 @@ debug.Print("foot:","["+c.left+"]["+c.right+"]");
                 if(c.hits != 0){
                     this.buzz.InitContact(c);
                 }
-                this.panel.Update(this.buzz.dx, this.buzz.dy, this.buzz.fuel, c.dist);
+                this.panel.Update(this.buzz.dx, this.buzz.dy, this.buzz.fuel, c.dist, this.buzz.score);
 
+                this.buzz.lemTd = this.panel.lemTd;
+                
                 if(c.dist < 300){
                     this.zoomIn = 1;
                 }

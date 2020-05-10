@@ -56,9 +56,9 @@ var Util = {
     ArrayFirst: function(arr, index) {
         for (var i = 0; i < arr.length; i++) {
             if (arr[i].index == index)
-                return true;
+                return arr[i];
         }    
-        return false;
+        return null;
     },
     OneIn: function(c){
         return Util.Rnd(0,c)==0;

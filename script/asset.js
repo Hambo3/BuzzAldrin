@@ -16,6 +16,7 @@
         this.dy = 0;
         this.dr = 0;
 
+        this.score = 0;
         this.fuel = 750;
         this.rate = {
             rotation: {
@@ -28,11 +29,12 @@
                     }
         };
 
+        this.lemTd = 0;
         this.celebrations = celebrations;
         this.safeZones = safeZones;
 
-        this.body = (this.type == 0) ? Util.Scale(Factory.Buzz(1), 3) : Util.Scale(Factory.LEM(1), 1.5);
-        this.ptcache = (this.type == 0) ? Util.Scale(Factory.Buzz(1), 3) : Util.Scale(Factory.LEM(1), 1.5);
+        this.body = (this.type == 0) ? Util.Scale(Factory.Buzz(1), 4) : Util.Scale(Factory.LEM(1), 1.5);
+        this.ptcache = (this.type == 0) ? Util.Scale(Factory.Buzz(1), 4) : Util.Scale(Factory.LEM(1), 1.5);
 
         this.thrustSnd = Const.Sound.thrust;
         this.leftFoot = 5;
@@ -56,13 +58,16 @@
            
             var cl = Util.ArrayFirst(this.safeZones, contact.left);
             var cr = Util.ArrayFirst(this.safeZones, contact.right);
-            this.dy = 0;
-            this.dx = 0; 
-            if((this.dx == 0 && this.dy < 1 && (r > 359 || r < 1)) && (cl && cr))
+
+            if((this.dx == 0 && this.dy < 1 && (r > 359 || r < 1)) && (cl!=null && cr!=null))
             {                
                 this.state = Const.State.landed;
                 this.tdCount = 100;
                 this.congrats = Util.OneOf(this.celebrations.success);
+                if(this.type == 0 && this.lemTd == 2){
+                    this.congrats = this.celebrations.success[0];
+                }
+                this.score = 50 * cl.rate;
             }
             else
             {
@@ -93,9 +98,12 @@
 
                 this.state = Const.State.crashed;
                 this.congrats = Util.OneOf(this.celebrations.fail);
+                this.score = 5;
                 this.tdCount = 100;
                 Sound.Play(Const.Sound.crash);
             }
+            this.dy = 0;
+            this.dx = 0; 
 
         },
         Check: function(landscape, offset){
@@ -158,6 +166,14 @@
             return {hits:c, dist:near, left:left, right:right};
         },
         Update: function(dt, scale) {
+            this.scale = scale;
+            var rImpulse = this.rate.rotation.impulse * dt;
+            var drag = this.rate.rotation.drag * dt;
+            var tImpulse = this.rate.thrust.impulse * dt;
+            var nImpulse = this.rate.thrust.drag * dt;
+            var gravity = this.gravity * dt;
+            var resistance = this.resistance *dt;
+
             if(this.state == Const.State.finished)
             {
                 if(--this.tdCount == 0)
@@ -171,40 +187,40 @@
                 if(this.thrust < 0)
                 {
                     this.thrust = 0;
-                }
-                
+                }                
+
                 if(--this.tdCount == 0)
                 {
                     this.state = Const.State.finished;
-                    this.tdCount = 300;
+                    this.tdCount = 250;
+                }
+
+                if(this.type == 1){
+                    this.ptcache[this.flameIndex].pt[1].y = 21 + (8000*this.thrust);
+                }
+                else{
+                    for(var b = this.flameIndex; b < this.ptcache.length; b++) {
+                        this.ptcache[b].pt[1].y = 40 + (8000*this.thrust);
+                    } 
                 }
             }
             else if(this.state == Const.State.crashed)
             {
-                for(var b = 0; b < this.ptcache.length; b++) {
-
+                for(var b = 0; b < this.ptcache.length; b++) 
+                {
                     for(var i = 0; i < this.ptcache[b].pt.length; i++) {
                         this.ptcache[b].pt[i].x += this.ptcache[b].dx;
                         this.ptcache[b].pt[i].y += this.ptcache[b].dy;
                     }  
-                } 
-                
+                }
                 if(--this.tdCount == 0)
                 {
                     this.state = Const.State.finished;
-                    this.tdCount = 300;
-                }
+                    this.tdCount = 250;
+                } 
             }
             else if(this.state == Const.State.enabled)
             {
-                this.scale = scale;
-                var rImpulse = this.rate.rotation.impulse * dt;
-                var drag = this.rate.rotation.drag * dt;
-                var tImpulse = this.rate.thrust.impulse * dt;
-                var nImpulse = this.rate.thrust.drag * dt;
-                var gravity = this.gravity * dt;
-                var resistance = this.resistance *dt;
-
                 if(input.isDown('W') || input.isDown('UP'))
                 {
                     this.thrust += tImpulse;
@@ -284,12 +300,23 @@
             if(this.state != Const.State.disabled)
             {
                 Renderer.VectorSprite((this.x * this.scale)-os.x, (this.y * this.scale)-os.y, this.ptcache, 0, 1);
+                
+                if(this.state >= Const.State.crashed)
+                {
+                    Renderer.DrawText(this.congrats, 280,120, "#FFFFFF", "16px Arial");
+                    Renderer.DrawText(this.score + " POINTS", 330,180, "#FFFFFF", "16px Arial");
 
-                if(this.state == Const.State.crashed){
-                    Renderer.DrawText(this.congrats, 300,300);
+                    if(this.type == 0 && this.lemTd == 2){
+                        Renderer.DrawText("BUT ARMSTRONG GOT THERE FIRST", 280,140, "#FFFFFF", "16px Arial");
+                    }
                 }
-                else if(this.state == Const.State.landed){
-                    Renderer.DrawText(this.congrats, 300,300);
+                else{
+                    if(this.lemTd == 1){
+                        Renderer.DrawText("30 SECONDS TILL EAGLE LANDS", 280,120, "#FFFFFF", "16px Arial");
+                    }
+                    if(this.lemTd == 2){
+                        Renderer.DrawText("EAGLE HAS LANDED", 280,120, "#FFFFFF", "16px Arial");
+                    }
                 }
             }
 		}
@@ -297,9 +324,10 @@
 
     window.Buzz = Buzz;
 
-
     ///score panel
     function Panel(type) {
+        this.tdDate = new Date(1969,7,20,0,1,21,0);
+        this.started = new Date();
         this.time = 0;
         this.score = 0;
         this.fuel = 0;
@@ -307,36 +335,65 @@
         this.verticalSpeed=0;
         this.horizontalSpeed = 0;
         this.type = type;
+        this.lemTd = 0;
     };
     Panel.prototype = {
         
-        Update: function(horiz, vert, fuel, alt) {
+        Update: function(horiz, vert, fuel, alt, score) {
             this.verticalSpeed = parseInt(150 * vert);
             this.horizontalSpeed = parseInt(150 * horiz);
             this.fuel = fuel;
             this.altitude = alt;
+
+            this.score = score;
+
+            var elapsed = new Date() - this.started;            
+            var d = new Date(elapsed);
+
+            if(this.type == 0 && this.lemTd < 2){
+
+                if(elapsed > 50000){
+                    this.lemTd = 1;
+                }
+
+                if(elapsed < 80000){
+                    d = new Date(this.tdDate - elapsed);
+                }
+                else{
+                    this.lemTd = 2;
+                    this.started = new Date();
+                }
+            }
+
+            var m = d.getMinutes();
+            var s = d.getSeconds();
+
+            this.time = "0"+m + ":" + (s<10 ? "0"+s : s);
         },
         Render: function(os) {
 
             if(this.type == 1){
-                Renderer.DrawText("TIME", 100,40);
-                Renderer.DrawText("FUEL", 100,60);
+                Renderer.DrawText("TIME", 144,40);
+                Renderer.DrawText("FUEL", 144,60);
 
-                Renderer.DrawText(this.time, 180,40);
-                Renderer.DrawText(parseInt(this.fuel), 180,60);
+                Renderer.DrawText(this.time, 220,40);
+                Renderer.DrawText(parseInt(this.fuel), 220,60);
             }
             else{
-                Renderer.DrawText("TIME TILL LM LANDING", 20,40);
-                Renderer.DrawText(this.time, 180,40);
+                Renderer.DrawText("TIME TILL LEM TOUCHDOWN", 20,40);
+                Renderer.DrawText(this.time, 220,40);
+                if(this.lemTd < 2){
+                    Renderer.DrawText("-", 212,40);
+                }
             }
 
-            Renderer.DrawText("SCORE", 100,20);                        
+            Renderer.DrawText("SCORE", 144,20);                        
 
             Renderer.DrawText("ALTITUDE", 500,20);
             Renderer.DrawText("HORIZONTAL SPEED", 500,40);
             Renderer.DrawText("VERTICAL SPEED", 500,60);
 
-            Renderer.DrawText(this.score, 180,20);
+            Renderer.DrawText(this.score, 220,20);
 
             Renderer.DrawText(parseInt(this.altitude), 640,20);
             Renderer.DrawText(Math.abs(this.horizontalSpeed), 640,40);            
@@ -368,6 +425,7 @@
         //this.next =
 
         this.titleCol = start == 0 ? 0 : 1;
+        this.subTitleCol = start == 0 ? 0 : 1;
         this.menuCol = start == 0 ? 0 : 1;
         this.mapCol = start == 0 ? 0 : 0.2;
 
@@ -385,7 +443,10 @@
             if(this.state == 0){
                 this.titleCol = Util.SLerp(this.titleCol, 1, 0.005);
                 if(this.titleCol > 0.95){
-                    this.state++;
+                    this.subTitleCol = Util.SLerp(this.subTitleCol, 1, 0.005);
+                    if(this.subTitleCol > 0.95){
+                        this.state++;
+                    }
                 }                        
             }
             else if(this.state == 1){
@@ -395,7 +456,7 @@
                     this.state++;
                 }                        
             }
-            else if(this.state == 2){
+            if(this.state == 1 || this.state == 2){
                 if((input.isUp('W') || input.isUp('UP')) && this.selected > 0)
                 {
                     this.selected--;
@@ -424,6 +485,7 @@
                     this.state=2;
                 }
             }
+            input.Clr();
         },
         Render: function() {
 
@@ -434,6 +496,10 @@
                 Renderer.DrawText("BUZZ ALDRIN", 190,240, 
                     "rgba(255, 255, 255, "+this.titleCol+")", 
                     "64px Arial");
+
+                Renderer.DrawText("First man on the moon".split("").join(String.fromCharCode(8201)), 230,264, 
+                    "rgba(255, 255, 255, "+this.subTitleCol+")", 
+                    "24px Arial");    
             }
 
             if(this.state > 0)
@@ -444,7 +510,7 @@
                     Renderer.DrawText("[up]              [W]", 396,200, "#FFFFFF", "20px Arial");
                     Renderer.DrawText("Control lander using [left] [right] or [A] [D]", 190,224, "#FFFFFF", "20px Arial");
 
-                    this.help = Util.SLerp(this.help, 1500, 1);
+                    this.help = Util.SLerp(this.help, 1800, 1);
 
                     switch (parseInt(this.help / 300)){
                         case 0:
@@ -483,23 +549,28 @@
 
                             Renderer.DrawText("Land safely on a designated landing zone", 190,340, "#FFFFFF", "20px Arial");
                             Renderer.DrawText("2X", 380,560, "#FFFFFF", "20px Arial");
-                            break;                                   
+                            break;   
+                        case 6:
+                            this.LM.thrust = Util.Lerp(this.LM.thrust, 0, 0.1);
+                            this.LM.y = Util.Lerp(this.LM.y, 500, 0.01);
+                            this.LM.Render({x:0, y:0});
+
+                            Renderer.VectorLine(Factory.HelpTerrain(), PAL[1], {x:0,y:0}, 1);
+                            Renderer.DrawText("2X", 380,560, "#FFFFFF", "20px Arial");
+                            break;                             
                     }
                 }
                 else{
-                    Renderer.DrawText("First man on the moon", 280,264, 
-                        "rgba(255, 255, 255, "+this.menuCol+")", 
-                        "24px Arial");
-
-
-                    Renderer.DrawText("[Start] (Buzz Aldrin)", 300,360, "rgba(255, 255, 255, "+this.menuCol+")", "20px Arial");
-                    Renderer.DrawText("[Start] (Neil Armstrong)", 300,384, "rgba(255, 255, 255, "+this.menuCol+")", "20px Arial");
-                    Renderer.DrawText("[Help]", 300,408, "rgba(255, 255, 255, "+this.menuCol+")", "20px Arial");
+                    Renderer.DrawText("[Play Buzz Aldrin]", 300,360, "rgba(255, 255, 255, "+this.menuCol+")", "20px Arial");
+                    Renderer.DrawText("[Play Lunar Lander]", 300,384, "rgba(255, 255, 255, "+this.menuCol+")", "20px Arial");
+                    Renderer.DrawText("[Info]", 300,408, "rgba(255, 255, 255, "+this.menuCol+")", "20px Arial");
 
                     Renderer.DrawText(">", 260, 366 + (this.selected * 24), "rgba(255, 255, 255, "+this.menuCol+")", "32px Arial");
                     Renderer.DrawText("<", 560, 366 + (this.selected * 24), "rgba(255, 255, 255, "+this.menuCol+")", "32px Arial");
 
-                    Renderer.DrawText("[Space] to select", 100,500, "#555555", "20px Arial");
+                    Renderer.DrawText("[Up]", 100,500, "#555555", "20px Arial");
+                    Renderer.DrawText("[Down]", 100,525, "#555555", "20px Arial");
+                    Renderer.DrawText("[Space] to select", 100,550, "#555555", "20px Arial");
                 }
             }
 

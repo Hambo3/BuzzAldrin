@@ -67,6 +67,9 @@
             var k = releasedKeys[key.toUpperCase()];
             releasedKeys[key] = false;
             return k;
+        },
+        Clr: function() {
+            releasedKeys = [];
         }
     };
 })();
