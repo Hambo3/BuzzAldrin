@@ -24,12 +24,12 @@ var AudioManager = function (files) {
     }
 
     function play(index){
-        sounds[index].Play();
+        return sounds[index].Play();
     }
 
     return {
         Play: function (index) {
-            play(index);
+            return play(index);
         },
         Stop: function (index){
             stop(index);
@@ -56,7 +56,6 @@ var AudioSequence = function (snds, rnd) {
         else{
             index = (index < sounds.length-1) ? index+1 : 0;
         }
-        console.log(index);
     }
 
     function play(){
@@ -64,27 +63,43 @@ var AudioSequence = function (snds, rnd) {
             this.currentTime = 0;
             sounds[index].play();
             playing = true;
+            return true;
+        }
+        else{
+            return false;
         }
     }
 
     return {
         Play: function () {
-            play();
+            return play();
         }
     }
 };
 
 var AudioLoop = function (snd) {
+    var playing = false;
     var sound = new Audio(snd);
-    sound.addEventListener('ended', play, false);
+    sound.addEventListener('ended', loop, false);
+
+    function loop(){
+        if(playing == true){
+            this.currentTime = 0;
+            sound.play();
+        }
+    }
 
     function play(){
-        this.currentTime = 0;
-        sound.play();
+        if(playing == false){
+            this.currentTime = 0;
+            sound.play();
+            playing = true;
+        }
     }
 
     function stop(){
-        sound.removeEventListener('ended', play);
+        //sound.removeEventListener('ended', loop);
+        playing = false;
     }
 
     return {
@@ -98,18 +113,32 @@ var AudioLoop = function (snd) {
 };
 
 var AudioPlay = function (snd) {
+    var playing = false;    
     var sound = new Audio(snd);
 
+    sound.addEventListener('ended', end, false);
+
     function play(){
-        sound.play();
+        if(!playing){
+            sound.play();
+            playing = true;
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    function end(){
+        playing = false;
     }
 
     return {
         Play: function () {
-            play();
+            return play();
         },
         Stop: function (){
-            stop();
+            end();
         }
     }
 };

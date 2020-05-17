@@ -33,6 +33,13 @@ var Util = {
 
         return 0; // No collision  
     },
+    Direction: function(angle, speed)
+    {
+        angle = angle * Math.PI / 180.0;
+        
+        return {x:-(speed * Math.sin(angle)),
+                y:speed * Math.cos(angle)};
+    },
     RotatePoint: function (pointX, pointY, angle){
         // convert angle to radians
         angle = angle * Math.PI / 180.0
@@ -132,7 +139,7 @@ var Util = {
         }
 
         return offset;
-    },
+    }
 }
 
 // a v simple object pooler
@@ -463,9 +470,7 @@ var Factory = {
             {col: PAL[0], pt: [{x:-11, y:18},{x:-11, y:16}] },//left foot
             {col: PAL[0], pt: [{x:11, y:18},{x:11, y:16}] },  //right foot
 
-            {col: PAL[col], pt: [{x:-2, y:8},{x:-7, y:22}] },//flame 
-            {col: PAL[col], pt: [{x:0, y:11},{x:-1, y:21}] },//flame 
-            {col: PAL[col], pt: [{x:2, y:8},{x:7, y:21}] }//flame 
+            {col: PAL[0], pt: [{x:0, y:6},{x:0, y:8}] }
         ];
     }
 };
@@ -498,7 +503,8 @@ var Const = {
         enabled:1,
         crashed:2,
         landed:3,
-        finished:4
+        finished:4,
+        congrats:5
     },
     GameState:{
         title:0,
@@ -510,6 +516,11 @@ var Const = {
         crash:0,
         thrust:1,
         ambient:2,
-        farts:3
+        farts:3,
+        goforundock:4,
+        eaglehaswings:5,
+        lookinggood:6,
+        radiocrackle:7,
+        standingby:8
     }
 }

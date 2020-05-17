@@ -67,6 +67,7 @@ var PolyRenderer = function (context, screen) {
 
     function box(x, y, plane, rot){
         ctx.strokeStyle = plane.col;
+        ctx.globalAlpha = 1; 
         ctx.beginPath();
 
         var r = R(plane.pt[0].x, plane.pt[0].y, rot);
@@ -91,6 +92,17 @@ var PolyRenderer = function (context, screen) {
         ctx.stroke();
     }
 
+    function circle(x, y, r, col, fill){
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, 2 * Math.PI);
+        if(fill){
+            ctx.fillStyle = fill;
+            ctx.fill();
+        }
+        ctx.strokeStyle = col;
+        ctx.stroke();
+    }
+
     function inBounds(x, y){
         return (!bounds || ((x > bounds.minx && x < bounds.maxx) && (y > bounds.miny  && y < bounds.maxy)) ); 
     }
@@ -109,11 +121,14 @@ var PolyRenderer = function (context, screen) {
         VectorLine: function(poly, col, start, scale){
             vectorLine(poly, col, start, scale);
         },
-        DrawText: function(txt, x, y, col, font){
+        DrawText: function(txt, x, y, col, font, align){
             context.font = font || "12px Arial";
             context.fillStyle = col ? col : PAL[1];
-            //context.textAlign = "center";
+            context.textAlign = align || "left";
             context.fillText(txt, x, y);
-        }             
+        }, 
+        DrawCircle: function(x, y, r, col, fill){
+            circle(x, y, r, col, fill);
+        }         
     }
 };

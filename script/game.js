@@ -19,6 +19,7 @@
         this.scale = this.minZoom;
 
         this.zoomIn = false;
+        this.zoomOut = false;
 
         this.celebrations = 
         [
@@ -65,7 +66,13 @@
                     this.zoomIn = 0;
                 }
             }
-
+            if(this.zoomOut > 0){
+                this.scale = Util.Lerp(this.scale, this.zoomOut, 0.01);
+                if(this.scale < (this.zoomOut - 0.01))
+                {
+                    this.zoomOut = 0;
+                }
+            }
 
             Util.ScrollTo(this.buzz.x * this.scale, this.buzz.y * this.scale,
                 {width:800, height:600}, 
@@ -77,15 +84,13 @@
             if(this.buzz.state == Const.State.enabled){
                 var c = this.buzz.Check(this.landscape, this.offset);
 
-debug.Print("foot:","["+c.left+"]["+c.right+"]");
-
                 if(c.hits != 0){
                     this.buzz.InitContact(c);
                 }
                 this.panel.Update(this.buzz.dx, this.buzz.dy, this.buzz.fuel, c.dist, this.buzz.score);
 
-                this.buzz.lemTd = this.panel.lemTd;
-                
+                this.buzz.lemTd = this.panel.lemTd;                
+
                 if(c.dist < 300){
                     this.zoomIn = 1;
                 }
@@ -97,6 +102,10 @@ debug.Print("foot:","["+c.left+"]["+c.right+"]");
                     this.zoomIn = 0.2;
                 }                 
             }
+            // else if(!this.zoomOut && this.buzz.state == Const.State.congrats)
+            // {
+            //     this.zoomOut = this.minZoom;
+            // }
 
             if(this.LM){
                 this.LM.Update(dt, this.scale);

@@ -48,6 +48,7 @@
 
             this.thrustSnd = Const.Sound.farts;
         }
+        this.parps = new ObjectPool();
         this.tdCount = 0;
         this.congrats;
     };
@@ -181,6 +182,14 @@
                     this.state = Const.State.disabled;
                 }
             }
+            else if(this.state == Const.State.congrats)
+            {
+                if(--this.tdCount == 0)
+                {
+                    this.state = Const.State.finished;
+                    this.tdCount = 250;
+                } 
+            }
             else if(this.state == Const.State.landed)
             {
                 this.thrust -= nImpulse;
@@ -191,17 +200,23 @@
 
                 if(--this.tdCount == 0)
                 {
-                    this.state = Const.State.finished;
-                    this.tdCount = 250;
+                    if(this.type == 1){
+                        this.state = Const.State.finished;
+                        this.tdCount = 250;
+                    }
+                    else{
+                        this.state = Const.State.congrats;
+                        this.tdCount = 250;
+                    }
                 }
 
                 if(this.type == 1){
                     this.ptcache[this.flameIndex].pt[1].y = 21 + (8000*this.thrust);
                 }
                 else{
-                    for(var b = this.flameIndex; b < this.ptcache.length; b++) {
-                        this.ptcache[b].pt[1].y = 40 + (8000*this.thrust);
-                    } 
+                    // for(var b = this.flameIndex; b < this.ptcache.length; b++) {
+                    //     this.ptcache[b].pt[1].y = 40 + (8000*this.thrust);
+                    // } 
                 }
             }
             else if(this.state == Const.State.crashed)
@@ -224,7 +239,27 @@
                 if(input.isDown('W') || input.isDown('UP'))
                 {
                     this.thrust += tImpulse;
-                    Sound.Play(this.thrustSnd);
+                    if(Sound.Play(this.thrustSnd)){
+                        if(this.type == 0)
+                        {
+                            var pt = Util.Direction(this.rotation, Util.Rnd(80,100) * (1+this.dy));
+
+                            for (let i = 0; i < Util.Rnd(4,10); i++) 
+                            {
+                                this.parps.Add(
+                                    {
+                                        x:this.x + this.ptcache[this.flameIndex].pt[1].x + Util.Rnd(-16,16), 
+                                        y:this.y + (this.ptcache[this.flameIndex].pt[1].y + Util.Rnd(0,16)), 
+                                        dtx:pt.x,
+                                        dty:pt.y,
+                                        r:10, 
+                                        t:1, 
+                                        enabled:true
+                                    });                                 
+                            }
+
+                        }
+                    }
                 }
                 else{
                     this.thrust -= nImpulse;
@@ -280,9 +315,9 @@
                     this.body[this.flameIndex].pt[1].y = 21 + (8000*this.thrust);
                 }
                 else{
-                    for(var b = this.flameIndex; b < this.body.length; b++) {
-                        this.body[b].pt[1].y = 40 + (8000*this.thrust);
-                    } 
+                    // for(var b = this.flameIndex; b < this.body.length; b++) {
+                    //     this.body[b].pt[1].y = 40 + (8000*this.thrust);
+                    // } 
                 }
 
                 var pts = [];
@@ -294,28 +329,55 @@
                     }  
                     this.ptcache[b].pt = pts;
                 }
+
+
             }
-        },
+
+            if(this.type == 0){
+                var prps = this.parps.Get();
+
+                for(var e = 0; e < prps.length; e++) 
+                {
+                    prps[e].x += prps[e].dtx*dt;
+                    prps[e].y += prps[e].dty*dt;
+                    prps[e].t = Util.Lerp(prps[e].t, 0, 0.03);
+                    prps[e].enabled = prps[e].t > 0.1;
+                }  
+            }  
+         },
         Render: function(os) {
             if(this.state != Const.State.disabled)
             {
                 Renderer.VectorSprite((this.x * this.scale)-os.x, (this.y * this.scale)-os.y, this.ptcache, 0, 1);
                 
+                if(this.type == 0){
+                    var prps = this.parps.Get();
+
+                    for(var e = 0; e < prps.length; e++) 
+                    {
+                        Renderer.DrawCircle(
+                            (prps[e].x * this.scale)-os.x, 
+                            (prps[e].y * this.scale)-os.y, 
+                            prps[e].r * this.scale, 
+                            "rgba(255, 255, 255, "+prps[e].t+")",
+                            "#000000");
+                    }  
+                }
                 if(this.state >= Const.State.crashed)
                 {
-                    Renderer.DrawText(this.congrats, 280,120, "#FFFFFF", "16px Arial");
-                    Renderer.DrawText(this.score + " POINTS", 330,180, "#FFFFFF", "16px Arial");
+                    Renderer.DrawText(this.congrats, 400,120, "#FFFFFF", "16px Arial", "center");
+                    Renderer.DrawText(this.score + " POINTS", 400,180, "#FFFFFF", "16px Arial", "center");
 
                     if(this.type == 0 && this.lemTd == 2){
-                        Renderer.DrawText("BUT ARMSTRONG GOT THERE FIRST", 280,140, "#FFFFFF", "16px Arial");
+                        Renderer.DrawText("BUT ARMSTRONG GOT THERE FIRST", 400,140, "#FFFFFF", "16px Arial", "center");
                     }
                 }
                 else{
                     if(this.lemTd == 1){
-                        Renderer.DrawText("30 SECONDS TILL EAGLE LANDS", 280,120, "#FFFFFF", "16px Arial");
+                        Renderer.DrawText("30 SECONDS TILL EAGLE LANDS", 400,120, "#FFFFFF", "16px Arial", "center");
                     }
                     if(this.lemTd == 2){
-                        Renderer.DrawText("EAGLE HAS LANDED", 280,120, "#FFFFFF", "16px Arial");
+                        Renderer.DrawText("EAGLE HAS LANDED", 400,120, "#FFFFFF", "16px Arial", "center");
                     }
                 }
             }
@@ -382,7 +444,7 @@
             else{
                 Renderer.DrawText("TIME TILL LEM TOUCHDOWN", 20,40);
                 Renderer.DrawText(this.time, 220,40);
-                if(this.lemTd < 2){
+                if(this.lemTd == 2){
                     Renderer.DrawText("-", 212,40);
                 }
             }
@@ -493,13 +555,13 @@
             
             if(this.state < 3){
                 Renderer.VectorLine(this.landscape, "rgba(200, 200, 200, "+this.mapCol+")", {x:0, y:0}, this.scale);
-                Renderer.DrawText("BUZZ ALDRIN", 190,240, 
+                Renderer.DrawText("BUZZ ALDRIN", 400,240, 
                     "rgba(255, 255, 255, "+this.titleCol+")", 
-                    "64px Arial");
+                    "64px Arial", "center");
 
-                Renderer.DrawText("First man on the moon".split("").join(String.fromCharCode(8201)), 230,264, 
+                Renderer.DrawText("First man on the moon".split("").join(String.fromCharCode(8201)), 400,264, 
                     "rgba(255, 255, 255, "+this.subTitleCol+")", 
-                    "24px Arial");    
+                    "24px Arial", "center");    
             }
 
             if(this.state > 0)
@@ -655,60 +717,109 @@
     window.Orbiter = Orbiter; 
 
         ///buzz intro screen
-        function BuzzIntro(start){
+        function BuzzIntro(start, skip){
             this.start = start;
             this.scale = 0.7;
-            
+            this.canSkip = skip;
             this.LM = new LM(1320, 200, 0 ,0, 2);
             this.Orbiter = new Orbiter(1320, 200, 0 ,0, 2);
             this.LM.rotation = 270;
             this.Orbiter.rotation = 270;
 
-            this.timings = [300,500,200,600, 300, 200, 400, 400];
+            this.timings = [100,500,200,600, 
+                            300,200,400,400, 
+                            100,200,40,60,100,
+                            160,160,100,200];
             this.stage = 0;
             this.counter = this.timings[this.stage];
 
-            this.txtCol = 0;
+            this.txtCol = 0;    
+            this.playing = [];   
+
+            this.door = {
+                x:184,
+                y:166,
+                anim:false,
+                scale:1,
+                alpha:1
+            };
+
+            this.buzz = {
+                x:184,
+                y:166,
+                anim:false,
+                scale:1,
+                alpha:0
+            };
         };
     
         BuzzIntro.prototype = {            
             Update: function(dt) {
-                //this.start(0);
-                if(input.isUp('ESC'))
-                {
-                    this.start(0);
+
+                if(this.canSkip){
+                    if(input.isUp('SPACE'))
+                    {
+                        input.Clr();
+                        Sound.Stop(Const.Sound.radiocrackle);                       
+                        this.start(0);
+                    }
                 }
 
+                // if(input.isUp('ESC'))
+                // {
+                //     this.start(0);
+                //     Sound.Stop(Const.Sound.radiocrackle);
+                // }
+                // if(input.isUp('S'))
+                // {                 
+                //     this.stage = 8;   
+                //     this.counter = this.timings[this.stage];
+                // }
                 if(--this.counter == 0){
                     this.stage++;
                     if(this.stage == this.timings.length){
+                        
+                        Sound.Stop(Const.Sound.radiocrackle);
                         this.start(0);
                     }
                     else{
                         this.counter = this.timings[this.stage];
                     }
                 }
-                debug.Print("count:","["+this.counter+"]");
+ debug.Print("count:","["+this.counter+"]");
+ debug.Print("stage:","["+this.stage+"]");
                 switch (this.stage){ 
                     case 0:
+                        if(!this.playing[Const.Sound.radiocrackle]){
+                            Sound.Play(Const.Sound.radiocrackle);
+                            this.playing[Const.Sound.radiocrackle] = true;
+                        }
                         this.txtCol = Util.Lerp(this.txtCol, 1, 0.01);
                         break;
                     case 1:
-                        //date 20 Juluy 1969
-                        this.txtCol = Util.Lerp(this.txtCol, 0, 0.1);
                         this.Orbiter.x = Util.Lerp(this.Orbiter.x, 400, 0.003);
                         this.LM.x = Util.Lerp(this.LM.x, 400, 0.003);
                         break;
                     case 2:
                         //pause
+                        if(!this.playing[Const.Sound.standingby]){
+                            Sound.Play(Const.Sound.standingby);
+                            this.playing[Const.Sound.standingby] = true;
+                        }
+                        //date 20 Juluy 1969
+                        this.txtCol = Util.Lerp(this.txtCol, 0, 0.1);
                         break;   
                     case 3:
-                        //prepare
+                        //prepare                        
                         this.Orbiter.rotation = Util.Lerp(this.Orbiter.rotation, 360, 0.01);
                         this.LM.rotation = Util.Lerp(this.LM.rotation, 360, 0.01);
                         break;     
                     case 4:
                         //prepare for sep
+                        if(!this.playing[Const.Sound.goforundock]){
+                            Sound.Play(Const.Sound.goforundock);
+                            this.playing[Const.Sound.goforundock] = true;
+                        }
                         this.scale = Util.Lerp(this.scale, 1, 0.01); 
                         this.Orbiter.x = Util.Lerp(this.Orbiter.x, 400, 0.01);
                         this.LM.x = Util.Lerp(this.LM.x, 400, 0.01);                       
@@ -717,37 +828,119 @@
                         this.Orbiter.y = Util.Lerp(this.Orbiter.y, -0, 0.003);
                         break;    
                     case 6:
+                        if(!this.playing[Const.Sound.eaglehaswings]){
+                            Sound.Play(Const.Sound.eaglehaswings);
+                            this.playing[Const.Sound.eaglehaswings] = true;
+                        }
                         this.scale = Util.Lerp(this.scale, 1.5, 0.01);
                         this.Orbiter.x = Util.Lerp(this.Orbiter.x, 250, 0.01);
                         this.Orbiter.y = Util.Lerp(this.Orbiter.y, -200, 0.003);
                         this.LM.x = Util.Lerp(this.LM.x, 250, 0.01);
                         break;  
                     case 7:
+                        if(!this.playing[Const.Sound.lookinggood]){
+                            Sound.Play(Const.Sound.lookinggood);
+                            this.playing[Const.Sound.lookinggood] = true;
+                        }
                         this.scale = Util.Lerp(this.scale, 2, 0.01);
                         this.LM.x = Util.Lerp(this.LM.x, 200, 0.01);
                         break;  
+                    case 8:
+                        //
+                        Sound.Stop(Const.Sound.radiocrackle);
+                        this.LM.rotation = 360;
+                        this.scale = 2;
+                        this.LM.x = 200;
+                        this.door.anim = 'buzz1';
+                        this.buzz.anim = 'buzz1';
+                        break;  
+                    case 9:
+                        //
+                        this.buzz.anim = 'buzz2';
+                        this.buzz.alpha = Util.Lerp(this.buzz.alpha, 1, 0.01);
+                        break;                          
+                    case 10:
+                        //
+                        this.buzz.anim = 'buzz3';
+                        break;  
+                    case 11:
+                        //
+                        this.buzz.anim = 'buzz4';
+                        this.buzz.x = Util.Lerp(this.buzz.x, 203, 0.03);
+                        this.buzz.y = Util.Lerp(this.buzz.y, 156, 0.03);
+                        break;  
+                    case 12:
+                        //
+                        this.buzz.x = Util.Lerp(this.buzz.x, 216, 0.03);
+                        this.buzz.y = Util.Lerp(this.buzz.y, 166, 0.03);
+                        break;  
+                    case 13:
+                        this.buzz.anim = 'buzz6';
+                        //bye neil
+                        break;                        
+                    case 14:
+                        //slam door
+                        //cya on the moon
+                        this.door.anim = false;
+                        this.buzz.anim = 'buzz4';
+                        break; 
+                    case 15:
+                        //jump1
+                        //Asshole
+                        this.buzz.anim = 'buzz5';
+                        break; 
+                    case 16:
+                        //jump2
+                        this.buzz.anim = 'buzz4';
+                        this.buzz.x = Util.Lerp(this.buzz.x, 280, 0.03);
+                        this.buzz.y = Util.Lerp(this.buzz.y, 146, 0.03);
+                        break;                         
                     case 99:
                         break;                            
                 }
                 this.Orbiter.Update(dt, this.scale);
                 this.LM.Update(dt, this.scale);
+
+                input.Clr();
             },
             Render: function() {
                 Renderer.Clear(25*32,19*32);
 
                 this.Orbiter.Render({x:0, y:0});
-                this.LM.Render({x:0, y:0});
+                this.LM.Render({x:0, y:0});                
+
+                if(this.door.anim){
+                    SpriteRender.Sprite((this.LM.x + this.door.x), (this.LM.y + this.door.y), 
+                    this.door.anim, 0, this.door.scale, 1, this.door.alpha);
+                }
+
+                if(this.buzz.anim){
+                    SpriteRender.Sprite((this.LM.x + this.buzz.x), (this.LM.y + this.buzz.y), 
+                    this.buzz.anim, 0, this.buzz.scale, 1, this.buzz.alpha);
+                }
 
                 switch (this.stage){ 
                     case 0:
-                        Renderer.DrawText("20 July 1969", 300,300, "rgba(255, 255, 255, "+this.txtCol+")", "48px Arial");
+                        Renderer.DrawText("20 July 1969", 400,300, "rgba(255, 255, 255, "+this.txtCol+")", "48px Arial", "center");
                         break;
                     case 1:
-                        Renderer.DrawText("20 July 1969", 300,300, "rgba(255, 255, 255, "+this.txtCol+")", "48px Arial");
-                        break;                        
+                    case 2:
+                        Renderer.DrawText("20 July 1969", 400,300, "rgba(255, 255, 255, "+this.txtCol+")", "48px Arial", "center");
+                        break;  
+                    case 13:
+                        Renderer.DrawText("Bye Neil", 400,300, "rgba(255, 255, 255, 1)", "16px Arial");
+                        break; 
+                    case 14:
+                        Renderer.DrawText("Cya on the moon", 400,300, "rgba(255, 255, 255, 1)", "16px Arial");
+                        break;    
+                    case 15:
+                        Renderer.DrawText("Asshole!", 400,300, "rgba(255, 255, 255, 1)", "16px Arial");
+                        break;                                                      
                 }
 
-                debug.Render(true, true);
+                if(this.canSkip){
+                    Renderer.DrawText("[Space] to skip", 100,500, "#555555", "20px Arial");
+                }
             }
         };
         window.BuzzIntro = BuzzIntro;

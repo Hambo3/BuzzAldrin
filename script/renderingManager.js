@@ -37,13 +37,14 @@ var RenderingManager = function (ctx, options) {
         rbox(box.x, box.y, box.width, box.height, r);
     }
 
-    function RenderSprite(x, y, sprite, fr, center, z) {
+    function RenderSprite(x, y, sprite, fr, center, z, a) {
         var s = spriteData[sprite];
         var frame = s.src[fr];
         if(center){
             x-=(s.w/2);
             y-=(s.h/2);
         }        
+        context.globalAlpha = a || 1;
         context.drawImage(assets[s.tag], frame.x, frame.y, s.w, s.h, 
             Math.round(x), Math.round(y), s.w*z, s.h*z);
     }
@@ -58,36 +59,7 @@ var RenderingManager = function (ctx, options) {
         context.globalAlpha = a;
         context.drawImage(assets[spr.tag], frame.x, frame.y, w, h,
              -w/2, -h/2, w, h); 
-    }
-
-    function init() {
-        var numAssets = spritesheet.length;
-
-        spritesheet.forEach(function(sheet) 
-        {
-            if(sheet.recol)
-            {
-                --numAssets;
-            }
-            else
-            {
-                var a = new Image();
-                a.src = sheet.src;
-                var tag = sheet.tag;
-                a.onload = function() { 
-                    assets[tag] = a;
-                    
-                    if(--numAssets == 0)
-                    {
-                        if(onReady){
-                            onReady();				
-                        }
-                    }
-                };
-            }
-
-        });
-       context.imageSmoothingEnabled = false;
+        context.globalAlpha = 1;     
     }
 
     function init() {
@@ -121,42 +93,6 @@ var RenderingManager = function (ctx, options) {
     }
 
     return {
-        Init: function (options) {
-
-            spritesheet = options.spritesheet;
-            context = options.context;
-            spriteData = options.spriteData;
-            onReady = options.onReady;
-            centerBased = options.centerBased || centerBased;
-
-            var numAssets = spritesheet.length;
-
-            spritesheet.forEach(function(sheet) 
-            {
-                if(sheet.recol)
-                {
-                    --numAssets;
-                }
-                else
-                {
-                    var a = new Image();
-                    a.src = sheet.src;
-                    var tag = sheet.tag;
-                    a.onload = function() { 
-                        assets[tag] = a;
-                        
-                        if(--numAssets == 0)
-                        {
-                            if(onReady){
-                                onReady();				
-                            }
-                        }
-                    };
-                }
-
-            });
-           context.imageSmoothingEnabled = false;
-        },
         SetContext: function (sx, sy){
             context.setTransform(sx, 0, 0, sy, 0, 0);
         },
@@ -164,7 +100,7 @@ var RenderingManager = function (ctx, options) {
             context.clearRect(0, 0, 640, 480);
         },
         Sprite: function(x, y, sprite, frame, scale, rotate, alpha){
-            RenderSprite(x, y, sprite, frame, false, scale);
+            RenderSprite(x, y, sprite, frame, false, scale, alpha);
         },
         Tile: function(x, y, sprite,z){
             RenderSprite(x, y, sprite, 0, false, z);

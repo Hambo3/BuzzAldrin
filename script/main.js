@@ -33,8 +33,19 @@ var fps = 60;
 var step = 1 / fps;
 
 var gameAsset;
-
 var Renderer;
+var SpriteRender;
+var skip = false;
+
+var fileSource=	[{ src:'content/sprite.png', tag:"set" }];
+var spriteDef = {
+	'buzz1':{ tag:"set", src:[{x:0,y:0}],w:33,h:42},
+	'buzz2':{ tag:"set", src:[{x:33,y:0}],w:33,h:42},
+	'buzz3':{ tag:"set", src:[{x:66,y:0}],w:33,h:42},
+	'buzz4':{ tag:"set", src:[{x:99,y:0}],w:33,h:42},
+	'buzz5':{ tag:"set", src:[{x:132,y:0}],w:33,h:42},
+	'buzz6':{ tag:"set", src:[{x:165,y:0}],w:33,h:42}
+};
 
 var state = Const.GameState.title;
 
@@ -80,7 +91,7 @@ function Start(canvasBody)
 	var canvas = document.createElement("canvas");
 	if(canvas.getContext)
 	{
-		ctx = canvas.getContext("2d");
+		ctx = canvas.getContext('2d', { alpha: false });
 		canvas.width = map.screen.width;
 		canvas.height = map.screen.height;
 
@@ -89,8 +100,38 @@ function Start(canvasBody)
 
 		//everything is drawn by this renderer
 		Renderer = new PolyRenderer(ctx, {w:canvas.width, h:canvas.height});
+		SpriteRender = new RenderingManager(ctx, {
+			spritesheet:fileSource,
+			spriteData:spriteDef,
+			onReady:init
+		});
 		Sound = new AudioManager(
 			[
+				{
+					key:Const.Sound.radiocrackle,
+					src:"audio/radiocrackle.wav",
+					type:"loop"
+				},
+				{
+					key:Const.Sound.standingby,
+					src:"audio/standingby.wav",
+					type:"play"
+				},
+				{
+					key:Const.Sound.goforundock,
+					src:"audio/goforundock.wav",
+					type:"play"
+				},
+				{
+					key:Const.Sound.eaglehaswings,
+					src:"audio/eaglehaswings.wav",
+					type:"play"
+				},
+				{
+					key:Const.Sound.lookinggood,
+					src:"audio/lookinggood.wav",
+					type:"play"
+				},
 				{
 					key:Const.Sound.crash,
 					src:"audio/collision.wav",
@@ -128,13 +169,14 @@ function Start(canvasBody)
 
 		debug = new Debug({ctx:ctx});
 
-		init();
+		//init();
 	}
 }
 
 function GameStart(type){
 	if(type==2){
-		gameAsset = new BuzzIntro(GameStart);
+		gameAsset = new BuzzIntro(GameStart, skip);
+		skip = true;
 	}
 	else{
 		gameAsset = new Game(map.maps[type], type, TitleScreen);
