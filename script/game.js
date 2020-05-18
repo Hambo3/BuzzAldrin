@@ -25,7 +25,7 @@
         [
             {
                 success:["YOU MADE IT BUZZ",
-                        "BUZZ ALDRIN FIRST MAN ON THE MOON"],
+                        "CONGRATULATIONS BUZZ, FIRST MAN ON THE MOON"],
                 fail:[   
                     "YOU BROKE EVERY BONE IN YOUR BODY",
                     "THAT DIDNT QUITE WORK OUT THEN BUZZ",

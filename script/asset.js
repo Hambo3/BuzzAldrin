@@ -626,6 +626,7 @@
                     Renderer.DrawText("[Play Buzz Aldrin]", 300,360, "rgba(255, 255, 255, "+this.menuCol+")", "20px Arial");
                     Renderer.DrawText("[Play Lunar Lander]", 300,384, "rgba(255, 255, 255, "+this.menuCol+")", "20px Arial");
                     Renderer.DrawText("[Info]", 300,408, "rgba(255, 255, 255, "+this.menuCol+")", "20px Arial");
+                    Renderer.DrawText("[Sound] On", 300,432, "rgba(255, 255, 255, "+this.menuCol+")", "20px Arial");
 
                     Renderer.DrawText(">", 260, 366 + (this.selected * 24), "rgba(255, 255, 255, "+this.menuCol+")", "32px Arial");
                     Renderer.DrawText("<", 560, 366 + (this.selected * 24), "rgba(255, 255, 255, "+this.menuCol+")", "32px Arial");
