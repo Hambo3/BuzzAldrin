@@ -112,6 +112,7 @@
             }
 
             if(this.buzz.state == Const.State.disabled){
+                input.Clr();
                 Sound.Stop(Const.Sound.ambient);
                 this.titleScreen();
             }

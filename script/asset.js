@@ -724,17 +724,18 @@
             this.canSkip = skip;
             this.LM = new LM(1320, 200, 0 ,0, 2);
             this.Orbiter = new Orbiter(1320, 200, 0 ,0, 2);
-            this.LM.rotation = 270;
-            this.Orbiter.rotation = 270;
+            this.LM.rotation = 90;
+            this.Orbiter.rotation = 90;
 
-            this.timings = [100,500,200,600, 
-                            300,200,400,400, 
-                            100,200,40,60,100,
+            this.timings = [120,500,200,100, 
+                            300,200,400,500, 
+                            150,100,200,40,60,100,
                             160,160,100,200];
             this.stage = 0;
             this.counter = this.timings[this.stage];
 
             this.txtCol = 0;    
+            this.txtCol2 = 0;    
             this.playing = [];   
 
             this.door = {
@@ -795,9 +796,10 @@
                             Sound.Play(Const.Sound.radiocrackle);
                             this.playing[Const.Sound.radiocrackle] = true;
                         }
-                        this.txtCol = Util.Lerp(this.txtCol, 1, 0.01);
+                        this.txtCol = Util.Lerp(this.txtCol, 1, 0.015);
                         break;
                     case 1:
+                        this.txtCol2 = Util.Lerp(this.txtCol2, 1, 0.01);
                         this.Orbiter.x = Util.Lerp(this.Orbiter.x, 400, 0.003);
                         this.LM.x = Util.Lerp(this.LM.x, 400, 0.003);
                         break;
@@ -809,11 +811,12 @@
                         }
                         //date 20 Juluy 1969
                         this.txtCol = Util.Lerp(this.txtCol, 0, 0.1);
+                        this.txtCol2 = Util.Lerp(this.txtCol2, 0, 0.1);
                         break;   
                     case 3:
                         //prepare                        
-                        this.Orbiter.rotation = Util.Lerp(this.Orbiter.rotation, 360, 0.01);
-                        this.LM.rotation = Util.Lerp(this.LM.rotation, 360, 0.01);
+                        //this.Orbiter.rotation = Util.Lerp(this.Orbiter.rotation, 360, 0.01);
+                        //this.LM.rotation = Util.Lerp(this.LM.rotation, 360, 0.01);
                         break;     
                     case 4:
                         //prepare for sep
@@ -826,7 +829,7 @@
                         this.LM.x = Util.Lerp(this.LM.x, 400, 0.01);                       
                         break;  
                     case 5:
-                        this.Orbiter.y = Util.Lerp(this.Orbiter.y, -0, 0.003);
+                        this.Orbiter.x = Util.Lerp(this.Orbiter.x, 600, 0.003);
                         break;    
                     case 6:
                         if(!this.playing[Const.Sound.eaglehaswings]){
@@ -834,8 +837,8 @@
                             this.playing[Const.Sound.eaglehaswings] = true;
                         }
                         this.scale = Util.Lerp(this.scale, 1.5, 0.01);
-                        this.Orbiter.x = Util.Lerp(this.Orbiter.x, 250, 0.01);
-                        this.Orbiter.y = Util.Lerp(this.Orbiter.y, -200, 0.003);
+                        this.Orbiter.x = Util.Lerp(this.Orbiter.x, 650, 0.01);
+                        //this.Orbiter.y = Util.Lerp(this.Orbiter.y, -200, 0.003);
                         this.LM.x = Util.Lerp(this.LM.x, 250, 0.01);
                         break;  
                     case 7:
@@ -845,8 +848,12 @@
                         }
                         this.scale = Util.Lerp(this.scale, 2, 0.01);
                         this.LM.x = Util.Lerp(this.LM.x, 200, 0.01);
+                        this.LM.rotation = Util.Lerp(this.LM.rotation, 0, 0.01);
                         break;  
                     case 8:
+                        //pause
+                        break;    
+                    case 9:
                         //
                         Sound.Stop(Const.Sound.radiocrackle);
                         this.LM.rotation = 360;
@@ -855,42 +862,42 @@
                         this.door.anim = 'buzz1';
                         this.buzz.anim = 'buzz1';
                         break;  
-                    case 9:
+                    case 10:
                         //
                         this.buzz.anim = 'buzz2';
                         this.buzz.alpha = Util.Lerp(this.buzz.alpha, 1, 0.01);
                         break;                          
-                    case 10:
+                    case 11:
                         //
                         this.buzz.anim = 'buzz3';
                         break;  
-                    case 11:
+                    case 12:
                         //
                         this.buzz.anim = 'buzz4';
                         this.buzz.x = Util.Lerp(this.buzz.x, 203, 0.03);
                         this.buzz.y = Util.Lerp(this.buzz.y, 156, 0.03);
                         break;  
-                    case 12:
+                    case 13:
                         //
                         this.buzz.x = Util.Lerp(this.buzz.x, 216, 0.03);
                         this.buzz.y = Util.Lerp(this.buzz.y, 166, 0.03);
                         break;  
-                    case 13:
+                    case 14:
                         this.buzz.anim = 'buzz6';
                         //bye neil
                         break;                        
-                    case 14:
+                    case 15:
                         //slam door
                         //cya on the moon
                         this.door.anim = false;
                         this.buzz.anim = 'buzz4';
                         break; 
-                    case 15:
+                    case 16:
                         //jump1
                         //Asshole
                         this.buzz.anim = 'buzz5';
                         break; 
-                    case 16:
+                    case 17:
                         //jump2
                         this.buzz.anim = 'buzz4';
                         this.buzz.x = Util.Lerp(this.buzz.x, 280, 0.03);
@@ -925,17 +932,18 @@
                         Renderer.DrawText("20 July 1969", 400,300, "rgba(255, 255, 255, "+this.txtCol+")", "48px Arial", "center");
                         break;
                     case 1:
+                        Renderer.DrawText("16km above the moon surface".split("").join(String.fromCharCode(8201)), 400,330, "rgba(255, 255, 255, "+this.txtCol2+")", "20px Arial", "center");
                     case 2:
                         Renderer.DrawText("20 July 1969", 400,300, "rgba(255, 255, 255, "+this.txtCol+")", "48px Arial", "center");
                         break;  
-                    case 13:
-                        Renderer.DrawText("Bye Neil", 400,300, "rgba(255, 255, 255, 1)", "16px Arial");
-                        break; 
                     case 14:
-                        Renderer.DrawText("Cya on the moon", 400,300, "rgba(255, 255, 255, 1)", "16px Arial");
-                        break;    
+                        Renderer.DrawText("Bye Neil", 440,340, "rgba(255, 255, 255, 1)", "16px Arial");
+                        break; 
                     case 15:
-                        Renderer.DrawText("Asshole!", 400,300, "rgba(255, 255, 255, 1)", "16px Arial");
+                        Renderer.DrawText("Cya on the moon", 440,340, "rgba(255, 255, 255, 1)", "16px Arial");
+                        break;    
+                    case 16:
+                        Renderer.DrawText("Asshole!", 440,340, "rgba(255, 255, 255, 1)", "16px Arial");
                         break;                                                      
                 }
 
